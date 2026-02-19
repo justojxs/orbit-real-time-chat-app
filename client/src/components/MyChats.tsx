@@ -1,0 +1,115 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useChatState } from "../context/ChatProvider";
+import { Plus } from "lucide-react";
+import GroupChatModal from "./miscellaneous/GroupChatModal";
+
+const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
+    const [loggedUser, setLoggedUser] = useState<any>();
+    const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers } = useChatState();
+
+    const fetchChats = async () => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            const { data } = await axios.get("/api/chat", config);
+            setChats(data);
+        } catch (error) {
+            console.error("Failed to fetch chats");
+        }
+    };
+
+    useEffect(() => {
+        setLoggedUser(JSON.parse(localStorage.getItem("userInfo") || "null"));
+        fetchChats();
+    }, [fetchAgain]);
+
+    const getSender = (loggedUser: any, users: any[]) => {
+        return users[0]?._id === loggedUser?._id ? users[1]?.name : users[0]?.name;
+    };
+
+    const getSenderFull = (loggedUser: any, users: any[]) => {
+        return users[0]?._id === loggedUser?._id ? users[1] : users[0];
+    };
+
+    const isUserOnline = (chat: any) => {
+        if (chat.isGroupChat) return false;
+        const recipient = getSenderFull(loggedUser, chat.users);
+        if (!recipient) return false;
+        return onlineUsers[recipient._id]?.isOnline || recipient.isOnline;
+    };
+
+    return (
+        <div className={`flex flex-col items-center p-3 py-6 bg-[#0c0c0e]/40 backdrop-blur-3xl w-full md:w-[32%] h-full border-r border-white/5 ${selectedChat ? "hidden md:flex" : "flex"}`}>
+            <div className="pb-6 px-4 flex w-full justify-between items-center">
+                <h1 className="text-2xl font-bold text-white tracking-tighter">Identity Stream</h1>
+                <GroupChatModal>
+                    <button className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/20 hover:bg-emerald-500/20 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                        <Plus size={14} strokeWidth={3} /> New Group
+                    </button>
+                </GroupChatModal>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar w-full">
+                {chats ? (
+                    chats.map((chat: any) => (
+                        <div
+                            onClick={() => setSelectedChat(chat)}
+                            key={chat._id}
+                            className={`cursor-pointer px-4 py-4 rounded-2xl transition-all border ${selectedChat?._id === chat._id
+                                ? "bg-white/[0.08] border-white/[0.1] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+                                : "bg-transparent border-transparent hover:bg-white/[0.04] hover:border-white/[0.05]"
+                                } active:scale-[0.98] group relative overflow-hidden`}
+                        >
+                            {selectedChat?._id === chat._id && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-emerald-500 rounded-full" />
+                            )}
+                            <div className="flex items-center gap-3 w-full">
+                                <div className="relative">
+                                    {!chat.isGroupChat ? (
+                                        <img
+                                            src={getSenderFull(loggedUser, chat.users)?.pic || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"}
+                                            className="w-12 h-12 rounded-full object-cover shadow-sm border border-white/5 flex-shrink-0"
+                                            alt="avatar"
+                                        />
+                                    ) : (
+                                        <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-lg shadow-sm border border-emerald-500/30 flex-shrink-0">
+                                            {chat.chatName[0]?.toUpperCase()}
+                                        </div>
+                                    )}
+                                    {isUserOnline(chat) && (
+                                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#121214]"></div>
+                                    )}
+                                </div>
+                                <div className="flex flex-col flex-1 overflow-hidden ml-1">
+                                    <h3 className="font-semibold text-[15px] text-white truncate">
+                                        {!chat.isGroupChat
+                                            ? getSender(loggedUser, chat.users)
+                                            : chat.chatName}
+                                    </h3>
+                                    {chat.latestMessage ? (
+                                        <p className={`text-xs mt-1 truncate ${selectedChat?._id === chat._id ? 'text-zinc-200' : 'text-zinc-400'}`}>
+                                            <span className="font-medium opacity-80">{chat.latestMessage.sender.name.split(' ')[0]}: </span>
+                                            {chat.latestMessage.image ? "📷 Image" : chat.latestMessage.fileUrl ? "📄 Document" : chat.latestMessage.content}
+                                        </p>
+                                    ) : (
+                                        <p className="text-[10px] mt-1 text-zinc-600 font-bold uppercase tracking-widest opacity-60">Initialize Encryption</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
+                        <div className="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default MyChats;

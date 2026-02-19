@@ -1,0 +1,13 @@
+{
+    "name": "orbit-chat-app",
+    "version": "1.0.0",
+    "scripts": {
+        "server": "cd server && npm run dev",
+        "client": "cd client && npm run dev",
+        "start": "concurrently \"npm run server\" \"npm run client\"",
+        "dev": "npm start"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.1"
+    }
+}
