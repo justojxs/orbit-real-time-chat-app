@@ -68,21 +68,34 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
+// Track active socket connections for each user to prevent refresh race conditions
+const userSockets = new Map<string, Set<string>>();
+
 io.on("connection", (socket) => {
-    console.log("Connected to socket.io");
+    console.log("Connected to socket.io", socket.id);
 
     socket.on("setup", async (userData) => {
         if (!userData || !userData._id) return;
 
-        socket.join(userData._id);
+        const userId = userData._id;
+        socket.join(userId);
         // @ts-ignore
-        socket.userId = userData._id;
+        socket.userId = userId;
+
+        // Add this socket to the user's session set
+        if (!userSockets.has(userId)) {
+            userSockets.set(userId, new Set());
+        }
+        const sessions = userSockets.get(userId);
+        const wasOffline = sessions?.size === 0; // Check if this is the first connection for this user
+        sessions?.add(socket.id);
 
         try {
-            await User.findByIdAndUpdate(userData._id, { isOnline: true });
-
-            // Notify others
-            socket.broadcast.emit("user presence", { userId: userData._id, isOnline: true });
+            // Only update database and broadcast if this is the FIRST connection
+            if (wasOffline) {
+                await User.findByIdAndUpdate(userId, { isOnline: true });
+                socket.broadcast.emit("user presence", { userId, isOnline: true });
+            }
 
             // Send current online users to the new user
             const onlineUsers = await User.find({ isOnline: true }).select('_id');
@@ -119,14 +132,14 @@ io.on("connection", (socket) => {
     });
 
     // New: Read Receipt Event
-    socket.on("read message", async (data) => {
+    socket.on("read message", async (data: any) => {
         const { chatId, userId } = data;
         if (!chatId || !userId) return;
 
         try {
             await Message.updateMany(
-                { chat: chatId, sender: { $ne: userId }, readBy: { $ne: userId } },
-                { $push: { readBy: userId } }
+                { chat: chatId, sender: { $ne: userId } },
+                { $addToSet: { readBy: userId } }
             );
             // Notify others in the room
             socket.in(chatId).emit("message read", { chatId, userId });
@@ -135,16 +148,33 @@ io.on("connection", (socket) => {
         }
     });
 
+    socket.on("message deleted", (data: any) => {
+        socket.in(data.chatId).emit("message deleted", data);
+    });
+
+    socket.on("reaction updated", (data: any) => {
+        socket.in(data.chatId).emit("reaction updated", data);
+    });
+
     socket.on("disconnect", async () => {
         // @ts-ignore
         const userId = socket.userId;
         if (userId) {
-            try {
-                const lastSeen = new Date();
-                await User.findByIdAndUpdate(userId, { isOnline: false, lastSeen });
-                socket.broadcast.emit("user presence", { userId, isOnline: false, lastSeen });
-            } catch (error) {
-                console.error("Presence update error:", error);
+            const sessions = userSockets.get(userId);
+            if (sessions) {
+                sessions.delete(socket.id);
+
+                // ONLY mark offline if this was the last active session
+                if (sessions.size === 0) {
+                    userSockets.delete(userId);
+                    try {
+                        const lastSeen = new Date();
+                        await User.findByIdAndUpdate(userId, { isOnline: false, lastSeen });
+                        socket.broadcast.emit("user presence", { userId, isOnline: false, lastSeen });
+                    } catch (error) {
+                        console.error("Disconnect presence error:", error);
+                    }
+                }
             }
         }
         console.log("USER DISCONNECTED");
