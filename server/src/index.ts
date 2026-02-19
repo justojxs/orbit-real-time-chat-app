@@ -72,16 +72,27 @@ io.on("connection", (socket) => {
     console.log("Connected to socket.io");
 
     socket.on("setup", async (userData) => {
+        if (!userData || !userData._id) return;
+
         socket.join(userData._id);
         // @ts-ignore
         socket.userId = userData._id;
+
         try {
             await User.findByIdAndUpdate(userData._id, { isOnline: true });
+
+            // Notify others
             socket.broadcast.emit("user presence", { userId: userData._id, isOnline: true });
+
+            // Send current online users to the new user
+            const onlineUsers = await User.find({ isOnline: true }).select('_id');
+            const onlineUserIds = onlineUsers.map(u => u._id.toString());
+            socket.emit("online users list", onlineUserIds);
+
+            socket.emit("connected");
         } catch (error) {
             console.error("Presence update error:", error);
         }
-        socket.emit("connected");
     });
 
     socket.on("join chat", async (room) => {

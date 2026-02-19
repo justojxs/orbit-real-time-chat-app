@@ -20,13 +20,41 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
         if (userInfo) {
             setUser(userInfo);
-            socket = io(ENDPOINT);
-            socket.emit("setup", userInfo);
+            socket = io(ENDPOINT, {
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+            });
+
+            const handleSetup = () => {
+                socket.emit("setup", userInfo);
+            };
+
+            socket.on("connect", handleSetup);
+
+            socket.on("online users list", (users: string[]) => {
+                const presenceMap: any = {};
+                users.forEach(id => {
+                    presenceMap[id] = { isOnline: true };
+                });
+                setOnlineUsers(presenceMap);
+            });
 
             socket.on("user presence", (data: any) => {
                 setOnlineUsers(prev => ({
                     ...prev,
                     [data.userId]: { isOnline: data.isOnline, lastSeen: data.lastSeen }
+                }));
+
+                // Proactively update the chats list if it exists
+                setChats(prevChats => prevChats.map(chat => {
+                    if (chat.isGroupChat) return chat;
+                    return {
+                        ...chat,
+                        users: chat.users.map((u: any) =>
+                            u._id === data.userId ? { ...u, isOnline: data.isOnline, lastSeen: data.lastSeen } : u
+                        )
+                    };
                 }));
             });
         } else {
@@ -34,7 +62,13 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         return () => {
-            if (socket) socket.disconnect();
+            if (socket) {
+                socket.off("connect");
+                socket.off("online users list");
+                socket.off("user presence");
+                socket.off("connected");
+                socket.disconnect();
+            }
         };
     }, [navigate]);
 
