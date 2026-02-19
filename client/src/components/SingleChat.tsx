@@ -239,9 +239,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         if (!dateString) return "Offline";
         const date = new Date(dateString);
         const now = new Date();
-        const diffInMins = Math.floor((now.getTime() - date.getTime()) / 60000);
+        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-        if (diffInMins < 1) return "Just now";
+        if (diffInSeconds < 60) return "Just now";
+        const diffInMins = Math.floor(diffInSeconds / 60);
+
         if (diffInMins < 60) return `${diffInMins}m ago`;
         if (diffInMins < 1440) return `${Math.floor(diffInMins / 60)}h ago`;
         return date.toLocaleDateString();
@@ -254,7 +256,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
 
         if (isTyping) return "Typing...";
         if (presence.isOnline) return "Online";
-        return `Last seen ${formatLastSeen(presence.lastSeen)}`;
+
+        // Only show last seen if they are truly offline
+        const lastSeenTime = formatLastSeen(presence.lastSeen);
+        return lastSeenTime === "Offline" ? "Offline" : `Last seen ${lastSeenTime}`;
     };
 
     return (
