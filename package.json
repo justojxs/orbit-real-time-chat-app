@@ -6,9 +6,12 @@
         "client": "cd client && npm run dev",
         "build": "cd client && npm run build && cd ../server && npm install",
         "start": "concurrently \"npm run server\" \"npm run client\"",
+        "test": "npm test --prefix server && npm test --prefix client",
         "dev": "npm start"
     },
     "devDependencies": {
+        "@playwright/test": "^1.58.2",
+        "@types/node": "^25.3.0",
         "concurrently": "^8.2.1"
     }
 }

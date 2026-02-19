@@ -1,0 +1,61 @@
+name: Orbit CI/CD
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Root Dependencies
+        run: npm install
+
+      - name: Install Client Dependencies
+        run: cd client && npm install
+
+      - name: Install Server Dependencies
+        run: cd server && npm install
+
+      - name: Run Server Unit Tests
+        run: cd server && npm test -- --run
+        env:
+          JWT_SECRET: test_secret
+          JWT_REFRESH_SECRET: test_refresh_secret
+
+      - name: Run Client Unit Tests
+        run: cd client && npm test -- --run
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E Tests
+        run: |
+          npm run dev &
+          npx playwright test
+        env:
+          VITE_API_URL: http://localhost:5001
+          MONGODB_URI: mongodb://localhost:27017/chat-test
+          JWT_SECRET: test_secret
+          PORT: 5001
