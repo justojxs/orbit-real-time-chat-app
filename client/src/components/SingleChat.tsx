@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useChatState } from "../context/ChatProvider";
 import axios from "axios";
 import ScrollableChat from "./ScrollableChat";
-import { Send, ArrowLeft, Image as ImageIcon, Loader2, Info, MoreVertical, Paperclip, FileText, Download } from "lucide-react";
+import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";

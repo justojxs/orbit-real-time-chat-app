@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useChatState } from "../context/ChatProvider";
-import { Check, CheckCheck, Trash2, Smile, Download, FileText, File } from "lucide-react";
+import { Check, CheckCheck, Trash2, Smile, Download, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
