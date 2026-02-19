@@ -161,7 +161,7 @@ const ScrollableChat = ({ messages, socket }: { messages: any[], socket: any }) 
                                             {m.reactions.map((r: any, idx: number) => (
                                                 <div
                                                     key={idx}
-                                                    className="bg-zinc-800/80 border border-white/5 px-2 py-0.5 rounded-full text-[12px] flex items-center shadow-lg"
+                                                    className="bg-zinc-800/80 border border-white/5 px-2 py-0.5 rounded-full text-[12px] flex items-center shadow-lg cursor-default hover:scale-110 transition-transform"
                                                     title={r.user.name}
                                                 >
                                                     {r.emoji}
