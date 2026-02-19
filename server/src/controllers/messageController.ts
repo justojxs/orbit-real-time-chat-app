@@ -24,9 +24,9 @@ const allMessages = asyncHandler(async (req: Request, res: Response) => {
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req: any, res: Response) => {
-    const { content, chatId, image, fileUrl, fileName, fileType } = req.body;
+    const { content, chatId, image, fileUrl, fileName, fileType, audioUrl, audioDuration } = req.body;
 
-    if (!chatId || (!content && !image && !fileUrl)) {
+    if (!chatId || (!content && !image && !fileUrl && !audioUrl)) {
         console.log("Invalid data passed into request");
         res.sendStatus(400);
         return;
@@ -39,6 +39,8 @@ const sendMessage = asyncHandler(async (req: any, res: Response) => {
         fileUrl: fileUrl || "",
         fileName: fileName || "",
         fileType: fileType || "",
+        audioUrl: audioUrl || "",
+        audioDuration: audioDuration || 0,
         chat: chatId,
         readBy: [req.user._id],
     };
@@ -139,4 +141,33 @@ const reactToMessage = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-export { allMessages, sendMessage, deleteMessage, reactToMessage };
+//@description     Search Messages in a Chat
+//@route           GET /api/Message/search/:chatId?query=...
+//@access          Protected
+const searchMessages = asyncHandler(async (req: Request, res: Response) => {
+    const { chatId } = req.params;
+    const { query } = req.query;
+
+    if (!query) {
+        res.json([]);
+        return;
+    }
+
+    try {
+        const messages = await Message.find({
+            chat: chatId,
+            content: { $regex: query as string, $options: "i" },
+            isDeleted: false
+        })
+            .populate("sender", "name pic")
+            .populate("chat")
+            .sort({ createdAt: -1 });
+
+        res.json(messages);
+    } catch (error: any) {
+        res.status(400);
+        throw new Error(error.message);
+    }
+});
+
+export { allMessages, sendMessage, deleteMessage, reactToMessage, searchMessages };

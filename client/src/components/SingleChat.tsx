@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useChatState } from "../context/ChatProvider";
 import axios from "axios";
 import ScrollableChat from "./ScrollableChat";
-import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText } from "lucide-react";
+import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
@@ -20,6 +20,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const [filePreview, setFilePreview] = useState<{ name: string, type: string } | null>(null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isGroupOpen, setIsGroupOpen] = useState(false);
+
+    // Search States
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<any[] | null>(null);
+
+    // Recording States
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingDuration, setRecordingDuration] = useState(0);
+    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const timerRef = useRef<any>(null);
 
     const { user, selectedChat, setSelectedChat, notification, setNotification, socket, onlineUsers } = useChatState();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,32 +59,117 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
-    const sendMessage = async (event: any) => {
-        if (event.key === "Enter" && newMessage && socket) {
-            socket.emit("stop typing", selectedChat._id);
-            try {
-                const config = {
-                    headers: {
-                        "Content-type": "application/json",
-                        Authorization: `Bearer ${user.token}`,
-                    },
-                };
-                const messageToSend = newMessage;
-                setNewMessage("");
-                const { data } = await axios.post(
-                    "/api/message",
-                    {
-                        content: messageToSend,
-                        chatId: selectedChat._id,
-                    },
-                    config
-                );
-                socket.emit("new message", data);
-                setMessages([...messages, data]);
-            } catch (error: any) {
-                console.error("Send message error:", error);
-            }
+    const handleSearch = async (query: string) => {
+        setSearchQuery(query);
+        if (!query.trim()) {
+            setSearchResults(null);
+            return;
         }
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            const { data } = await axios.get(`/api/message/search/${selectedChat._id}?query=${query}`, config);
+            setSearchResults(data);
+        } catch (error) {
+            console.error("Search error:", error);
+        }
+    };
+
+    const sendMessage = async (event?: any) => {
+        if ((event && event.key !== "Enter") && event.type !== "click") return;
+        if (!newMessage.trim() && !imagePreview && !filePreview && !audioBlob) return;
+
+        if (socket) socket.emit("stop typing", selectedChat._id);
+
+        try {
+            const config = {
+                headers: {
+                    "Content-type": "application/json",
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+
+            let payload: any = {
+                chatId: selectedChat._id,
+                content: newMessage,
+            };
+
+            // If we have an audio blob, we need to upload it first
+            if (audioBlob) {
+                setUploadingFile(true);
+                const data = new FormData();
+                data.append("file", audioBlob);
+                data.append("upload_preset", "chat-app");
+                data.append("cloud_name", "dencovhau");
+
+                const res = await fetch(`https://api.cloudinary.com/v1_1/dencovhau/video/upload`, {
+                    method: "POST",
+                    body: data,
+                });
+                const cloudData = await res.json();
+                payload.audioUrl = cloudData.secure_url;
+                payload.audioDuration = recordingDuration;
+                payload.content = ""; // Clear content for audio messages
+                setAudioBlob(null);
+                setAudioUrl(null);
+                setRecordingDuration(0);
+            }
+
+            setNewMessage("");
+            const { data } = await axios.post("/api/message", payload, config);
+            socket.emit("new message", data);
+            setMessages([...messages, data]);
+            setUploadingFile(false);
+        } catch (error: any) {
+            console.error("Send message error:", error);
+            setUploadingFile(false);
+        }
+    };
+
+    // Recording Logic
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            const chunks: BlobPart[] = [];
+
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+                setAudioBlob(blob);
+                setAudioUrl(URL.createObjectURL(blob));
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+            setRecordingDuration(0);
+            timerRef.current = setInterval(() => {
+                setRecordingDuration(prev => prev + 1);
+            }, 1000);
+        } catch (error) {
+            console.error("Failed to start recording:", error);
+            alert("Microphone access denied or not available");
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            clearInterval(timerRef.current);
+        }
+    };
+
+    const cancelRecording = () => {
+        stopRecording();
+        setAudioBlob(null);
+        setAudioUrl(null);
+        setRecordingDuration(0);
     };
 
     const handleFileUpload = async (e: any) => {
@@ -206,6 +304,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     useEffect(() => {
         fetchMessages();
         selectedChatCompare = selectedChat;
+        setIsSearchOpen(false);
+        setSearchQuery("");
+        setSearchResults(null);
     }, [selectedChat, socket]);
 
     const typingHandler = (e: any) => {
@@ -257,7 +358,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         if (isTyping) return "Typing...";
         if (presence.isOnline) return "Online";
 
-        // Only show last seen if they are truly offline
         const lastSeenTime = formatLastSeen(presence.lastSeen);
         return lastSeenTime === "Offline" ? "Offline" : `Last seen ${lastSeenTime}`;
     };
@@ -291,7 +391,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                             <button
                                                 onClick={() => setIsProfileOpen(true)}
                                                 className="p-1 text-zinc-600 hover:text-emerald-500 transition-colors bg-white/5 hover:bg-emerald-500/10 rounded-lg outline-none"
-                                                title="View User Details"
                                             >
                                                 <Info size={14} />
                                             </button>
@@ -316,12 +415,32 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                 </>
                             )}
                         </div>
+
                         <div className="flex items-center gap-2">
+                            <AnimatePresence>
+                                {isSearchOpen && (
+                                    <motion.div
+                                        initial={{ width: 0, opacity: 0 }}
+                                        animate={{ width: 200, opacity: 1 }}
+                                        exit={{ width: 0, opacity: 0 }}
+                                        className="relative overflow-hidden flex items-center bg-white/5 rounded-full px-4 border border-white/10"
+                                    >
+                                        <SearchIcon size={14} className="text-zinc-500" />
+                                        <input
+                                            autoFocus
+                                            className="bg-transparent border-none outline-none text-xs text-white py-2 px-2 w-full placeholder:text-zinc-600 font-medium"
+                                            placeholder="Search messages..."
+                                            value={searchQuery}
+                                            onChange={(e) => handleSearch(e.target.value)}
+                                        />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                             <button
-                                onClick={() => selectedChat.isGroupChat ? setIsGroupOpen(true) : setIsProfileOpen(true)}
-                                className="p-2.5 text-zinc-500 hover:text-white transition-colors bg-white/0 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/5"
+                                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                                className={`p-2.5 transition-colors rounded-xl border border-transparent ${isSearchOpen ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'text-zinc-500 hover:text-white hover:bg-white/5 hover:border-white/5'}`}
                             >
-                                <Info size={20} />
+                                <SearchIcon size={20} />
                             </button>
                             <button
                                 onClick={() => selectedChat.isGroupChat ? setIsGroupOpen(true) : setIsProfileOpen(true)}
@@ -339,13 +458,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                 <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-zinc-600">Syncing Stream</span>
                             </div>
                         ) : (
-                            <ScrollableChat messages={messages} socket={socket} />
+                            <ScrollableChat messages={searchResults || messages} socket={socket} />
+                        )}
+                        {searchResults && (
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-500/10 backdrop-blur-3xl border border-emerald-500/20 px-4 py-2 rounded-full z-30 flex items-center gap-3">
+                                <span className="text-[10px] uppercase font-black tracking-widest text-emerald-400">Showing {searchResults.length} results</span>
+                                <button onClick={() => { setSearchResults(null); setSearchQuery(""); setIsSearchOpen(false); }} className="text-zinc-500 hover:text-white"><X size={14} /></button>
+                            </div>
                         )}
                     </div>
 
                     <div className="p-6 pt-2 mt-auto relative z-20">
                         <AnimatePresence>
-                            {(imagePreview || filePreview) && (
+                            {(imagePreview || filePreview || audioUrl) && (
                                 <motion.div
                                     initial={{ opacity: 0, y: 10, scale: 0.9 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -355,26 +480,52 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                     <div className="relative group">
                                         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-emerald-500/40 blur-2xl rounded-full"></div>
                                         {imagePreview ? (
-                                            <img
-                                                src={imagePreview}
-                                                alt="preview"
-                                                className="w-32 h-32 object-cover rounded-3xl border-2 border-emerald-500/50 relative z-10 shadow-[0_20px_50px_rgba(16,185,129,0.3)]"
-                                            />
+                                            <img src={imagePreview} className="w-32 h-32 object-cover rounded-3xl border-2 border-emerald-500/50 relative z-10 shadow-[0_20px_50px_rgba(16,185,129,0.3)]" />
+                                        ) : audioUrl ? (
+                                            <div className="bg-[#121217] rounded-3xl border-2 border-emerald-500/50 relative z-10 p-4 flex flex-col items-center gap-2 shadow-[0_20px_50px_rgba(16,185,129,0.3)] min-w-[120px]">
+                                                <Volume2 className="text-emerald-500 animate-pulse" size={32} />
+                                                <span className="text-[10px] text-white font-bold uppercase">{Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}</span>
+                                                <button onClick={cancelRecording} className="text-[8px] text-zinc-500 hover:text-red-400 font-black uppercase tracking-widest mt-1">Cancel Stream</button>
+                                            </div>
                                         ) : (
                                             <div className="w-32 h-32 bg-[#121217] rounded-3xl border-2 border-emerald-500/50 relative z-10 flex flex-col items-center justify-center p-4">
                                                 <FileText className="text-emerald-500 mb-2" size={32} />
                                                 <p className="text-[8px] text-white truncate w-full text-center font-bold uppercase">{filePreview?.name}</p>
                                             </div>
                                         )}
-                                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 rounded-3xl backdrop-blur-[1px]">
-                                            <Loader2 className="text-emerald-400 animate-spin" size={24} />
-                                        </div>
+                                        {uploadingFile && (
+                                            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 rounded-3xl backdrop-blur-[1px]">
+                                                <Loader2 className="text-emerald-400 animate-spin" size={24} />
+                                            </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
                         <div className="relative group/input">
+                            <AnimatePresence>
+                                {isRecording && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        className="absolute inset-0 bg-emerald-500/20 backdrop-blur-3xl rounded-[2rem] z-50 flex items-center justify-between px-8 border border-emerald-500/30"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                                            <span className="text-sm font-bold text-white tracking-widest">RECORDING: {Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}</span>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <button onClick={cancelRecording} className="text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest">Discard</button>
+                                            <button onClick={stopRecording} className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+                                                <Square size={16} fill="white" />
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-[2rem] blur opacity-0 group-focus-within/input:opacity-100 transition-opacity duration-500"></div>
                             <div className="relative flex items-center gap-3 bg-zinc-900/80 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-2 pl-6 shadow-2xl">
                                 <button
@@ -399,8 +550,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                     onChange={typingHandler}
                                 />
                                 <button
-                                    onClick={() => sendMessage({ key: "Enter" })}
-                                    disabled={!newMessage.trim()}
+                                    className={`p-2 transition-colors ${isRecording ? 'text-red-500' : 'text-zinc-600 hover:text-emerald-400'}`}
+                                    onClick={startRecording}
+                                    title="Voice Note"
+                                >
+                                    <Mic size={22} className={isRecording ? 'animate-pulse' : ''} />
+                                </button>
+                                <button
+                                    onClick={() => sendMessage({ type: "click" })}
+                                    disabled={!newMessage.trim() && !audioUrl && !imagePreview && !filePreview}
                                     className="p-3.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-[1.5rem] transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] disabled:opacity-50 disabled:shadow-none disabled:bg-zinc-800 disabled:text-zinc-600 active:scale-95"
                                 >
                                     <Send size={18} />
@@ -428,11 +586,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                 </>
             ) : (
                 <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-[#0d0d12]">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="max-w-md"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md">
                         <div className="w-24 h-24 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
                             <Send size={40} className="text-emerald-500" />
                         </div>

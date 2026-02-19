@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useChatState } from "../context/ChatProvider";
-import { Check, CheckCheck, Trash2, Smile, Download, FileText } from "lucide-react";
+import { Check, CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
@@ -129,6 +129,21 @@ const ScrollableChat = ({ messages, socket }: { messages: any[], socket: any }) 
                                                 >
                                                     <Download size={16} />
                                                 </a>
+                                            </div>
+                                        )}
+
+                                        {!m.isDeleted && m.audioUrl && (
+                                            <div className="mb-3 -mx-2 -mt-2 bg-black/20 p-3 rounded-[1.2rem] border border-white/5 flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400">
+                                                    <Mic size={20} />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <audio
+                                                        controls
+                                                        src={m.audioUrl}
+                                                        className="h-8 w-full brightness-90 contrast-125 saturate-150 rounded-full [&::-webkit-media-controls-enclosure]:bg-emerald-500/10 [&::-webkit-media-controls-panel]:bg-transparent"
+                                                    />
+                                                </div>
                                             </div>
                                         )}
 

@@ -59,22 +59,56 @@ const accessChat = asyncHandler(async (req: any, res: Response) => {
 //@access          Protected
 const fetchChats = asyncHandler(async (req: any, res: Response) => {
     try {
-        Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+        const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
             .populate("users", "name pic email isOnline lastSeen")
             .populate("groupAdmin", "name pic email isOnline lastSeen")
             .populate("latestMessage")
-            .sort({ updatedAt: -1 })
-            .then(async (results: any) => {
-                results = await User.populate(results, {
-                    path: "latestMessage.sender",
-                    select: "name pic email isOnline lastSeen",
-                });
-                res.status(200).send(results);
+            .sort({ updatedAt: -1 });
+
+        const results = await User.populate(chats, {
+            path: "latestMessage.sender",
+            select: "name pic email isOnline lastSeen",
+        });
+
+        // Add unread counts for each chat
+        const chatsWithUnread = await Promise.all(results.map(async (chat: any) => {
+            const unreadCount = await Message.countDocuments({
+                chat: chat._id,
+                sender: { $ne: req.user._id },
+                readBy: { $ne: req.user._id }
             });
+            return { ...chat.toObject(), unreadCount };
+        }));
+
+        res.status(200).send(chatsWithUnread);
     } catch (error: any) {
         res.status(400);
         throw new Error(error.message);
     }
+});
+
+//@description     Toggle Pin Chat
+//@route           PUT /api/chat/pin
+//@access          Protected
+const togglePin = asyncHandler(async (req: any, res: Response) => {
+    const { chatId } = req.body;
+    const chat = await Chat.findById(chatId);
+
+    if (!chat) {
+        res.status(404);
+        throw new Error("Chat Not Found");
+    }
+
+    const isPinned = chat.pinnedBy.includes(req.user._id);
+    let updatedChat;
+
+    if (isPinned) {
+        updatedChat = await Chat.findByIdAndUpdate(chatId, { $pull: { pinnedBy: req.user._id } }, { new: true });
+    } else {
+        updatedChat = await Chat.findByIdAndUpdate(chatId, { $push: { pinnedBy: req.user._id } }, { new: true });
+    }
+
+    res.status(200).json(updatedChat);
 });
 
 //@description     Create New Group Chat
@@ -232,4 +266,5 @@ export {
     renameGroup,
     addToGroup,
     removeFromGroup,
+    togglePin,
 };

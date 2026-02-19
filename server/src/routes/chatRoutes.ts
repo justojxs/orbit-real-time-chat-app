@@ -6,6 +6,7 @@ import {
     removeFromGroup,
     addToGroup,
     renameGroup,
+    togglePin,
 } from "../controllers/chatController";
 import { protect } from "../middleware/authMiddleware";
 
@@ -17,5 +18,6 @@ router.route("/group").post(protect, createGroupChat);
 router.route("/rename").put(protect, renameGroup);
 router.route("/groupremove").put(protect, removeFromGroup);
 router.route("/groupadd").put(protect, addToGroup);
+router.route("/pin").put(protect, togglePin);
 
 export default router;

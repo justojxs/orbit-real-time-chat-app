@@ -8,6 +8,8 @@ const messageSchema = new mongoose.Schema(
         fileUrl: { type: String, trim: true },
         fileName: { type: String, trim: true },
         fileType: { type: String, trim: true },
+        audioUrl: { type: String, trim: true },
+        audioDuration: { type: Number },
         chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
         readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
         isDeleted: { type: Boolean, default: false },

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useChatState } from "../context/ChatProvider";
-import { Plus } from "lucide-react";
+import { Plus, Pin } from "lucide-react";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
     const [loggedUser, setLoggedUser] = useState<any>();
@@ -42,6 +43,30 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
         return onlineUsers[recipient._id]?.isOnline || recipient.isOnline;
     };
 
+    const togglePin = async (chatId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            await axios.put("/api/chat/pin", { chatId }, config);
+            fetchChats(); // Refresh
+        } catch (error) {
+            console.error("Failed to pin chat");
+        }
+    };
+
+    // Sorting logic: Pinned chats first, then by updatedAt
+    const sortedChats = chats ? [...chats].sort((a, b) => {
+        const aPinned = a.pinnedBy?.includes(user?._id);
+        const bPinned = b.pinnedBy?.includes(user?._id);
+        if (aPinned && !bPinned) return -1;
+        if (!aPinned && bPinned) return 1;
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    }) : [];
+
     return (
         <div className={`flex flex-col items-center p-3 py-6 bg-[#0c0c0e]/40 backdrop-blur-3xl w-full md:w-[32%] h-full border-r border-white/5 ${selectedChat ? "hidden md:flex" : "flex"}`}>
             <div className="pb-6 px-4 flex w-full justify-between items-center">
@@ -54,59 +79,89 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar w-full">
-                {chats ? (
-                    chats.map((chat: any) => (
-                        <div
-                            onClick={() => setSelectedChat(chat)}
-                            key={chat._id}
-                            className={`cursor-pointer px-4 py-4 rounded-2xl transition-all border ${selectedChat?._id === chat._id
-                                ? "bg-white/[0.08] border-white/[0.1] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                                : "bg-transparent border-transparent hover:bg-white/[0.04] hover:border-white/[0.05]"
-                                } active:scale-[0.98] group relative overflow-hidden`}
-                        >
-                            {selectedChat?._id === chat._id && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-emerald-500 rounded-full" />
-                            )}
-                            <div className="flex items-center gap-3 w-full">
-                                <div className="relative">
-                                    {!chat.isGroupChat ? (
-                                        <img
-                                            src={getSenderFull(loggedUser, chat.users)?.pic || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"}
-                                            className="w-12 h-12 rounded-full object-cover shadow-sm border border-white/5 flex-shrink-0"
-                                            alt="avatar"
-                                        />
-                                    ) : (
-                                        <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-lg shadow-sm border border-emerald-500/30 flex-shrink-0">
-                                            {chat.chatName[0]?.toUpperCase()}
+                <AnimatePresence initial={false}>
+                    {sortedChats.length > 0 ? (
+                        sortedChats.map((chat: any) => {
+                            const isPinned = chat.pinnedBy?.includes(user?._id);
+                            return (
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    onClick={() => setSelectedChat(chat)}
+                                    key={chat._id}
+                                    className={`cursor-pointer px-4 py-4 rounded-2xl transition-all border group relative overflow-hidden ${selectedChat?._id === chat._id
+                                        ? "bg-white/[0.08] border-white/[0.1] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+                                        : "bg-transparent border-transparent hover:bg-white/[0.04] hover:border-white/[0.05]"
+                                        } active:scale-[0.98]`}
+                                >
+                                    {selectedChat?._id === chat._id && (
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-emerald-500 rounded-full" />
+                                    )}
+
+                                    <div className="flex items-center gap-3 w-full">
+                                        <div className="relative">
+                                            {!chat.isGroupChat ? (
+                                                <img
+                                                    src={getSenderFull(loggedUser, chat.users)?.pic || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"}
+                                                    className="w-12 h-12 rounded-full object-cover shadow-sm border border-white/5 flex-shrink-0"
+                                                    alt="avatar"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-lg shadow-sm border border-emerald-500/30 flex-shrink-0">
+                                                    {chat.chatName[0]?.toUpperCase()}
+                                                </div>
+                                            )}
+                                            {isUserOnline(chat) && (
+                                                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#121214]"></div>
+                                            )}
                                         </div>
-                                    )}
-                                    {isUserOnline(chat) && (
-                                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#121214]"></div>
-                                    )}
-                                </div>
-                                <div className="flex flex-col flex-1 overflow-hidden ml-1">
-                                    <h3 className="font-semibold text-[15px] text-white truncate">
-                                        {!chat.isGroupChat
-                                            ? getSender(loggedUser, chat.users)
-                                            : chat.chatName}
-                                    </h3>
-                                    {chat.latestMessage ? (
-                                        <p className={`text-xs mt-1 truncate ${selectedChat?._id === chat._id ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                                            <span className="font-medium opacity-80">{chat.latestMessage.sender.name.split(' ')[0]}: </span>
-                                            {chat.latestMessage.image ? "📷 Image" : chat.latestMessage.fileUrl ? "📄 Document" : chat.latestMessage.content}
-                                        </p>
-                                    ) : (
-                                        <p className="text-[10px] mt-1 text-zinc-600 font-bold uppercase tracking-widest opacity-60">Initialize Encryption</p>
-                                    )}
-                                </div>
-                            </div>
+
+                                        <div className="flex flex-col flex-1 overflow-hidden ml-1">
+                                            <div className="flex justify-between items-center w-full">
+                                                <h3 className="font-semibold text-[15px] text-white truncate max-w-[70%]">
+                                                    {!chat.isGroupChat
+                                                        ? getSender(loggedUser, chat.users)
+                                                        : chat.chatName}
+                                                </h3>
+                                                <div className="flex items-center gap-2">
+                                                    {isPinned && <Pin size={12} className="text-emerald-500 fill-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
+                                                    <button
+                                                        onClick={(e) => togglePin(chat._id, e)}
+                                                        className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/10 rounded-lg transition-all text-zinc-500 hover:text-emerald-400"
+                                                    >
+                                                        <Pin size={14} className={isPinned ? "fill-current" : ""} />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex justify-between items-center mt-1">
+                                                {chat.latestMessage ? (
+                                                    <p className={`text-xs truncate max-w-[80%] ${selectedChat?._id === chat._id ? 'text-zinc-200' : 'text-zinc-400'}`}>
+                                                        <span className="font-medium opacity-80">{chat.latestMessage.sender.name.split(' ')[0]}: </span>
+                                                        {chat.latestMessage.image ? "📷 Image" : chat.latestMessage.fileUrl ? "📄 Document" : chat.latestMessage.audioUrl ? "🎤 Voice Note" : chat.latestMessage.content}
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest opacity-60">Initialize Encryption</p>
+                                                )}
+
+                                                {chat.unreadCount > 0 && (
+                                                    <div className="bg-emerald-500 text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] animate-pulse">
+                                                        {chat.unreadCount}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
+                            <div className="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
                         </div>
-                    ))
-                ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
-                        <div className="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                )}
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );
