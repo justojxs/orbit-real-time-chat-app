@@ -9,6 +9,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
     const [openReactionId, setOpenReactionId] = useState<string | null>(null);
+    const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,8 +42,11 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
         }
     };
 
-    const handleDelete = async (messageId: string) => {
-        if (!window.confirm("Delete this message?")) return;
+    const confirmDelete = async () => {
+        if (!messageToDelete) return;
+        const messageId = messageToDelete;
+        setMessageToDelete(null); // Close the modal immediately for better UX
+
         try {
             // Optimistic Update
             if (setMessages) {
@@ -154,7 +158,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                     </div>
                                                     {isMyMessage && (
                                                         <button
-                                                            onClick={() => handleDelete(m._id)}
+                                                            onClick={() => setMessageToDelete(m._id)}
                                                             className="p-2 bg-zinc-900/80 rounded-xl hover:text-red-500 transition-colors border border-white/5"
                                                         >
                                                             <Trash2 size={16} />
@@ -253,6 +257,51 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                     })}
             </AnimatePresence>
             <div ref={messagesEndRef} className="pb-4" />
+
+            {/* Custom Delete Confirmation Modal */}
+            <AnimatePresence>
+                {messageToDelete && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                        onClick={() => setMessageToDelete(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                            className="bg-[#121217] w-full max-w-sm rounded-[2rem] border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="p-6 text-center space-y-4">
+                                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
+                                    <Trash2 size={28} className="text-red-500" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white tracking-tight">Delete Message?</h3>
+                                <p className="text-zinc-400 text-sm px-2">
+                                    Are you sure you want to permanently delete this message for everyone in the chat? This action cannot be undone.
+                                </p>
+                            </div>
+                            <div className="flex border-t border-white/[0.05] bg-white/[0.02]">
+                                <button
+                                    onClick={() => setMessageToDelete(null)}
+                                    className="flex-1 py-4 text-zinc-400 font-medium hover:text-white hover:bg-white/[0.02] transition-colors border-r border-white/[0.05]"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    className="flex-1 py-4 text-red-500 font-bold hover:bg-red-500/10 transition-colors"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
