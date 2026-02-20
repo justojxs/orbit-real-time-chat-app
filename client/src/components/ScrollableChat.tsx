@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useChatState } from "../context/ChatProvider";
 import { Check, CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +8,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
     const { user, selectedChat } = useChatState();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    const [openReactionId, setOpenReactionId] = useState<string | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -122,22 +123,34 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                         >
                                             {/* Action Menu (My Messages) */}
                                             {!m.isDeleted && (
-                                                <div className={`absolute top-0 ${isMyMessage ? '-left-12' : '-right-12'} opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1`}>
-                                                    <div className="relative group/reactions">
-                                                        <button className="p-2 bg-zinc-900/80 rounded-xl hover:text-emerald-500 transition-colors border border-white/5">
+                                                <div className={`absolute top-0 ${isMyMessage ? '-left-12' : '-right-12'} opacity-100 flex flex-col gap-1`}>
+                                                    <div className="relative">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setOpenReactionId(openReactionId === m._id ? null : m._id);
+                                                            }}
+                                                            className="p-2 bg-zinc-900/80 rounded-xl hover:text-emerald-500 transition-colors border border-white/5"
+                                                        >
                                                             <Smile size={16} />
                                                         </button>
-                                                        <div className="absolute bottom-full mb-2 bg-[#121217] border border-white/10 p-1.5 rounded-2xl hidden group-hover/reactions:flex gap-1 shadow-2xl z-50">
-                                                            {COMMON_REACTIONS.map(emoji => (
-                                                                <button
-                                                                    key={emoji}
-                                                                    onClick={() => handleReact(m._id, emoji)}
-                                                                    className="hover:scale-125 transition-transform p-1 text-lg"
-                                                                >
-                                                                    {emoji}
-                                                                </button>
-                                                            ))}
-                                                        </div>
+                                                        {openReactionId === m._id && (
+                                                            <div className="absolute bottom-full mb-2 bg-[#121217] border border-white/10 p-1.5 rounded-2xl flex gap-1 shadow-2xl z-50">
+                                                                {COMMON_REACTIONS.map(emoji => (
+                                                                    <button
+                                                                        key={emoji}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleReact(m._id, emoji);
+                                                                            setOpenReactionId(null);
+                                                                        }}
+                                                                        className="hover:scale-125 transition-transform p-1 text-lg"
+                                                                    >
+                                                                        {emoji}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     {isMyMessage && (
                                                         <button
