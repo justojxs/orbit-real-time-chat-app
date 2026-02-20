@@ -291,8 +291,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         socket.on("message read", (data: any) => {
             if (selectedChatCompare && selectedChatCompare._id === data.chatId) {
                 setMessages((prev) => prev.map(msg => {
-                    if (msg.sender._id !== data.userId && (msg.readBy && !msg.readBy.includes(data.userId))) {
-                        return { ...msg, readBy: [...(msg.readBy || []), data.userId] };
+                    const senderId = msg.sender?._id || msg.sender;
+                    // Only process messages sent by someone other than the reader
+                    if (senderId !== data.userId) {
+                        const currentReadBy = msg.readBy || [];
+                        if (!currentReadBy.includes(data.userId)) {
+                            return { ...msg, readBy: [...currentReadBy, data.userId] };
+                        }
                     }
                     return msg;
                 }));
