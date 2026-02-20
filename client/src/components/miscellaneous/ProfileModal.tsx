@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Camera, Loader2, Save, User as UserIcon, Lock, Sparkles, Mail, Pencil, ShieldCheck } from "lucide-react";
+import { X, Camera, Loader2, User as UserIcon, Lock, Mail, ShieldCheck } from "lucide-react";
 import axios from "axios";
 import { useChatState } from "../../context/ChatProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -161,11 +161,7 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                                     onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
                                 />
                             </div>
-                            {!isEditing && (
-                                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-emerald-500 rounded-xl border-[3px] border-[#121217] flex items-center justify-center text-white shadow-lg z-20">
-                                    <Sparkles size={14} />
-                                </div>
-                            )}
+
                         </div>
 
                         {/* Info Section */}
