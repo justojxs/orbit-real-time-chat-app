@@ -110,7 +110,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                         </span>
                                     </motion.div>
                                 )}
-                                {m.isSystemMessage ? (
+                                {m.isSystemMessage || m.content?.includes("has left the group") || m.content?.includes("was removed from") || m.content?.includes("was added to") ? (
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
