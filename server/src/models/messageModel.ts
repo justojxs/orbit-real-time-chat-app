@@ -12,6 +12,7 @@ const messageSchema = new mongoose.Schema(
         audioDuration: { type: Number },
         chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
         readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+        isSystemMessage: { type: Boolean, default: false },
         isDeleted: { type: Boolean, default: false },
         reactions: [
             {

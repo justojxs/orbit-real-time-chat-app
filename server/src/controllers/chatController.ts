@@ -231,6 +231,7 @@ const removeFromGroup = asyncHandler(async (req: any, res: Response) => {
                 sender: req.user._id,
                 content: notificationContent,
                 chat: chatId,
+                isSystemMessage: true,
             });
 
             message = await Message.findById(message._id)
@@ -253,7 +254,7 @@ const removeFromGroup = asyncHandler(async (req: any, res: Response) => {
 //@description     Add user to Group / Leave
 //@route           PUT /api/chat/groupadd
 //@access          Protected
-const addToGroup = asyncHandler(async (req: Request, res: Response) => {
+const addToGroup = asyncHandler(async (req: any, res: Response) => {
     const { chatId, userId } = req.body;
 
     // check if the requester is admin
@@ -274,7 +275,32 @@ const addToGroup = asyncHandler(async (req: Request, res: Response) => {
         res.status(404);
         throw new Error("Chat Not Found");
     } else {
-        res.json(added);
+        // Create a notification message
+        const targetUser = await User.findById(userId);
+        const notificationContent = `${targetUser?.name} was added to the group`;
+
+        try {
+            let message: any = await Message.create({
+                sender: req.user._id, // Assume the person hitting the endpoint is the admin who added
+                content: notificationContent,
+                chat: chatId,
+                isSystemMessage: true,
+            });
+
+            message = await Message.findById(message._id)
+                .populate("sender", "name pic")
+                .populate("chat")
+                .populate({
+                    path: "chat.users",
+                    select: "name pic email isOnline lastSeen",
+                });
+
+            await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
+            res.json({ added, message });
+        } catch (error: any) {
+            res.status(400);
+            throw new Error(error.message);
+        }
     }
 });
 
