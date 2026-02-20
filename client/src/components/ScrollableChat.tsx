@@ -156,14 +156,12 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                             </div>
                                                         )}
                                                     </div>
-                                                    {isMyMessage && (
-                                                        <button
-                                                            onClick={() => setMessageToDelete(m._id)}
-                                                            className="p-2 bg-zinc-900/80 rounded-xl hover:text-red-500 transition-colors border border-white/5"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    )}
+                                                    <button
+                                                        onClick={() => setMessageToDelete(m._id)}
+                                                        className="p-2 bg-zinc-900/80 rounded-xl hover:text-red-500 transition-colors border border-white/5"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 </div>
                                             )}
 

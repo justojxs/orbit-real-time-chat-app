@@ -79,10 +79,7 @@ const deleteMessage = asyncHandler(async (req: any, res: Response) => {
             throw new Error("Message Not Found");
         }
 
-        if (!message.sender || message.sender.toString() !== req.user._id.toString()) {
-            res.status(401);
-            throw new Error("You can only delete your own messages");
-        }
+
 
         const updatedMessage = await Message.findByIdAndUpdate(
             messageId,

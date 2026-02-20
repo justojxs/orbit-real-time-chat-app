@@ -111,7 +111,7 @@ const Signup = () => {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Profile Picture</label>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Profile Picture (Optional)</label>
                     <label className="flex items-center gap-3 px-4 py-3.5 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.1] rounded-2xl cursor-pointer transition-all group overflow-hidden relative">
                         {pic ? (
                             <CheckCircle2 className="text-emerald-500 transition-transform animate-scale-in" size={20} />

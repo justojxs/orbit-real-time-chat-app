@@ -175,7 +175,7 @@ const HomePage = () => {
                                 }}
                                 whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(16,185,129,0.4)" }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => { setView("signup"); scrollToAuth(); }}
+                                onClick={() => { setView("login"); scrollToAuth(); }}
                                 className="group px-12 py-5 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl font-bold tracking-widest uppercase text-xs transition-all flex items-center gap-3 shadow-xl"
                             >
                                 Get Started
