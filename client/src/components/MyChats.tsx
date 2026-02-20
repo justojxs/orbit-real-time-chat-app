@@ -153,11 +153,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                                                     <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest opacity-60">No messages yet</p>
                                                 )}
 
-                                                {chat.unreadCount > 0 && (
-                                                    <div className="bg-emerald-500 text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] animate-pulse">
-                                                        {chat.unreadCount}
-                                                    </div>
-                                                )}
+
                                             </div>
                                         </div>
                                     </div>
