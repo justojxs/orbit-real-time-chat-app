@@ -10,6 +10,7 @@ import { Request, Response } from "express";
 const allMessages = asyncHandler(async (req: Request, res: Response) => {
     try {
         const messages = await Message.find({ chat: req.params.chatId })
+            .sort({ createdAt: 1 })
             .populate("sender", "name pic email isOnline lastSeen")
             .populate("chat")
             .populate("reactions.user", "name pic");
