@@ -185,7 +185,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery }: { me
                                             </span>
                                             {isMyMessage && !m.isDeleted && (
                                                 <span className="flex items-center">
-                                                    {m.readBy && (selectedChat.isGroupChat ? m.readBy.length > 1 : m.readBy.length > 1) ? (
+                                                    {m.readBy && (selectedChat.isGroupChat ? m.readBy.length >= selectedChat.users.length : m.readBy.length > 1) ? (
                                                         <CheckCheck size={16} className="text-emerald-300 stroke-[2.5]" />
                                                     ) : (
                                                         <Check size={16} className="text-white/80 stroke-[2.5]" />

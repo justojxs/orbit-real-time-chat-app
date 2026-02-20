@@ -55,6 +55,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             setLoading(false);
             socket.emit("join chat", selectedChat._id);
             socket.emit("read message", { chatId: selectedChat._id, userId: user._id });
+            setFetchAgain(!fetchAgain); // Force MyChats to refresh unread counts instantly
         } catch (error: any) {
             console.error("Fetch messages error:", error);
         }
@@ -144,6 +145,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             socket.emit("new message", data);
             setMessages([...messages, data]);
             setUploadingFile(false);
+            setFetchAgain(!fetchAgain); // Instantly update sidebar preview on outbound message
         } catch (error: any) {
             console.error("Send message error:", error);
             setUploadingFile(false);
@@ -282,6 +284,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             } else {
                 setMessages((prev) => [...prev, newMessageRecieved]);
                 socket.emit("read message", { chatId: selectedChatCompare._id, userId: user._id });
+                setFetchAgain(!fetchAgain); // Force sidebar to update latest message instantly
             }
         });
 
