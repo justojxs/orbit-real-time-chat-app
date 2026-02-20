@@ -4,7 +4,7 @@ import { Check, CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucid
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
-const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery }: { messages: any[], socket: any, activeMessageId?: string, searchQuery?: string }) => {
+const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMessages }: { messages: any[], socket: any, activeMessageId?: string, searchQuery?: string, setMessages?: any }) => {
     const { user, selectedChat } = useChatState();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -21,7 +21,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery }: { me
         }
     }, [messages, activeMessageId]);
 
-    const COMMON_REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🔥"];
+    const COMMON_REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
     const handleReact = async (messageId: string, emoji: string) => {
         try {
@@ -31,6 +31,9 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery }: { me
                 },
             };
             const { data } = await axios.put("/api/message/react", { messageId, emoji }, config);
+            if (setMessages) {
+                setMessages((prev: any[]) => prev.map(msg => msg._id === messageId ? { ...msg, reactions: data.reactions } : msg));
+            }
             socket.emit("reaction updated", { messageId, reactions: data.reactions, chatId: selectedChat._id });
         } catch (error) {
             console.error("Reaction error:", error);
@@ -40,6 +43,12 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery }: { me
     const handleDelete = async (messageId: string) => {
         if (!window.confirm("Delete this message?")) return;
         try {
+            // Optimistic Update
+            if (setMessages) {
+                setMessages((prev: any[]) => prev.map(msg =>
+                    msg._id === messageId ? { ...msg, isDeleted: true, content: "This message was deleted" } : msg
+                ));
+            }
             const config = {
                 headers: {
                     Authorization: `Bearer ${user.token}`,

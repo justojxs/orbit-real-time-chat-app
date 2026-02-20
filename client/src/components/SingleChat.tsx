@@ -493,6 +493,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                 socket={socket}
                                 activeMessageId={searchResults?.[activeSearchIndex]?._id}
                                 searchQuery={searchResults ? searchQuery : ""}
+                                setMessages={setMessages}
                             />
                         )}
                         {searchResults && (
