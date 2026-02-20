@@ -4,17 +4,22 @@ import { Check, CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucid
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
-const ScrollableChat = ({ messages, socket }: { messages: any[], socket: any }) => {
+const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery }: { messages: any[], socket: any, activeMessageId?: string, searchQuery?: string }) => {
     const { user, selectedChat } = useChatState();
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        if (activeMessageId && messageRefs.current[activeMessageId]) {
+            messageRefs.current[activeMessageId]?.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else {
+            scrollToBottom();
+        }
+    }, [messages, activeMessageId]);
 
     const COMMON_REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🔥"];
 
@@ -47,6 +52,24 @@ const ScrollableChat = ({ messages, socket }: { messages: any[], socket: any }) 
         }
     };
 
+    const highlightText = (text: string, highlight: string) => {
+        if (!highlight.trim()) return text;
+        const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const parts = text.split(new RegExp(`(${escapedHighlight})`, "gi"));
+        return (
+            <span>
+                {parts.map((part, i) => (
+                    <span
+                        key={i}
+                        className={part.toLowerCase() === highlight.toLowerCase() ? "bg-emerald-500/40 text-white font-bold px-0.5 rounded" : ""}
+                    >
+                        {part}
+                    </span>
+                ))}
+            </span>
+        );
+    };
+
     return (
         <div className="flex-1 overflow-y-auto px-6 space-y-6 custom-scrollbar flex flex-col pt-6 pb-12">
             <AnimatePresence initial={false}>
@@ -54,6 +77,7 @@ const ScrollableChat = ({ messages, socket }: { messages: any[], socket: any }) 
                     messages.map((m, i) => {
                         const isMyMessage = m.sender._id === user._id;
                         const hasReactions = m.reactions && m.reactions.length > 0;
+                        const isTarget = m._id === activeMessageId;
 
                         return (
                             <motion.div
@@ -61,10 +85,11 @@ const ScrollableChat = ({ messages, socket }: { messages: any[], socket: any }) 
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 className={`flex ${isMyMessage ? "justify-end" : "justify-start"} mb-4`}
                                 key={m._id || i}
+                                ref={(el) => (messageRefs.current[m._id] = el)}
                             >
-                                <div className={`flex flex-col ${isMyMessage ? "items-end" : "items-start"} max-w-[80%] sm:max-w-[65%]`}>
+                                <div className={`flex flex-col ${isMyMessage ? "items-end" : "items-start"} max-w-[80%] sm:max-w-[65%] transition-all ${isTarget ? 'scale-105' : ''}`}>
                                     <div
-                                        className={`px-5 py-4 rounded-[1.5rem] text-[14px] shadow-2xl relative group ${isMyMessage
+                                        className={`px-5 py-4 rounded-[1.5rem] text-[14px] shadow-2xl relative group transition-all ${isTarget ? 'ring-2 ring-emerald-500 ring-offset-4 ring-offset-[#0d0d12]' : ''} ${isMyMessage
                                             ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-tr-none shadow-emerald-500/10"
                                             : m.isDeleted
                                                 ? "bg-zinc-900/40 text-zinc-600 border border-white/5 italic"
@@ -149,7 +174,7 @@ const ScrollableChat = ({ messages, socket }: { messages: any[], socket: any }) 
 
                                         {m.content && (
                                             <div className={`leading-relaxed font-medium tracking-tight ${m.isDeleted ? 'opacity-40' : ''}`}>
-                                                {m.content}
+                                                {searchQuery ? highlightText(m.content, searchQuery) : m.content}
                                             </div>
                                         )}
 

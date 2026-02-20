@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Chat from "../models/chatModel";
 import User from "../models/userModel";
+import Message from "../models/messageModel";
 import { Request, Response } from "express";
 
 //@description     Create or fetch One to One Chat
@@ -175,8 +176,6 @@ const renameGroup = asyncHandler(async (req: Request, res: Response) => {
         res.json(updatedChat);
     }
 });
-
-import Message from "../models/messageModel";
 
 //@description     Remove user from Group
 //@route           PUT /api/chat/groupremove

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useChatState } from "../context/ChatProvider";
 import axios from "axios";
 import ScrollableChat from "./ScrollableChat";
-import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square } from "lucide-react";
+import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
@@ -25,6 +25,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[] | null>(null);
+    const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
 
     // Recording States
     const [isRecording, setIsRecording] = useState(false);
@@ -59,22 +60,42 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
-    const handleSearch = async (query: string) => {
+    const handleSearch = (query: string) => {
         setSearchQuery(query);
         if (!query.trim()) {
             setSearchResults(null);
+            setActiveSearchIndex(-1);
             return;
         }
-        try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${user.token}`,
-                },
-            };
-            const { data } = await axios.get(`/api/message/search/${selectedChat._id}?query=${query}`, config);
-            setSearchResults(data);
-        } catch (error) {
-            console.error("Search error:", error);
+
+        // Search locally within the already-loaded messages for instant, 100% reliable results
+        const matches = messages.filter((m) =>
+            m.content &&
+            m.content.toLowerCase().includes(query.toLowerCase()) &&
+            !m.isDeleted
+        );
+
+        // Sort matches by time (newest at bottom, but search should probably go from newest to oldest)
+        // Actually, we'll keep them in the order they appear in the chat (usually oldest to newest)
+        setSearchResults(matches);
+
+        if (matches.length > 0) {
+            // Start from the most recent match (the last one in the chronological array)
+            setActiveSearchIndex(matches.length - 1);
+        } else {
+            setActiveSearchIndex(-1);
+        }
+    };
+
+    const nextMatch = () => {
+        if (searchResults && searchResults.length > 0) {
+            setActiveSearchIndex((prev) => (prev + 1) % searchResults.length);
+        }
+    };
+
+    const prevMatch = () => {
+        if (searchResults && searchResults.length > 0) {
+            setActiveSearchIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length);
         }
     };
 
@@ -307,6 +328,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         setIsSearchOpen(false);
         setSearchQuery("");
         setSearchResults(null);
+        setActiveSearchIndex(-1);
     }, [selectedChat, socket]);
 
     const typingHandler = (e: any) => {
@@ -455,15 +477,42 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                         {loading ? (
                             <div className="flex flex-col items-center justify-center h-full gap-4">
                                 <Loader2 className="animate-spin text-emerald-500/50" size={32} />
-                                <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-zinc-600">Syncing Stream</span>
+                                <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-zinc-600">Loading messages</span>
                             </div>
                         ) : (
-                            <ScrollableChat messages={searchResults || messages} socket={socket} />
+                            <ScrollableChat
+                                messages={messages}
+                                socket={socket}
+                                activeMessageId={searchResults?.[activeSearchIndex]?._id}
+                                searchQuery={searchResults ? searchQuery : ""}
+                            />
                         )}
                         {searchResults && (
-                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-500/10 backdrop-blur-3xl border border-emerald-500/20 px-4 py-2 rounded-full z-30 flex items-center gap-3">
-                                <span className="text-[10px] uppercase font-black tracking-widest text-emerald-400">Showing {searchResults.length} results</span>
-                                <button onClick={() => { setSearchResults(null); setSearchQuery(""); setIsSearchOpen(false); }} className="text-zinc-500 hover:text-white"><X size={14} /></button>
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-500/10 backdrop-blur-3xl border border-emerald-500/20 px-6 py-2.5 rounded-full z-30 flex items-center gap-4 shadow-[0_20px_50px_rgba(16,185,129,0.2)]">
+                                <div className="flex items-center gap-2 border-r border-emerald-500/20 pr-4">
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-emerald-400">
+                                        {searchResults.length > 0 ? `${activeSearchIndex + 1} of ${searchResults.length}` : "0 results"}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={prevMatch}
+                                        disabled={!searchResults || searchResults.length === 0}
+                                        className="p-1 text-emerald-500 hover:text-white hover:bg-emerald-500/20 rounded-md transition-all disabled:opacity-20"
+                                    >
+                                        <ChevronUp size={18} />
+                                    </button>
+                                    <button
+                                        onClick={nextMatch}
+                                        disabled={!searchResults || searchResults.length === 0}
+                                        className="p-1 text-emerald-500 hover:text-white hover:bg-emerald-500/20 rounded-md transition-all disabled:opacity-20"
+                                    >
+                                        <ChevronDown size={18} />
+                                    </button>
+                                </div>
+                                <button onClick={() => { setSearchResults(null); setSearchQuery(""); setIsSearchOpen(false); setActiveSearchIndex(-1); }} className="text-zinc-500 hover:text-white ml-2">
+                                    <X size={16} />
+                                </button>
                             </div>
                         )}
                     </div>
@@ -592,8 +641,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                         </div>
                         <h2 className="text-4xl font-bold text-white tracking-tighter mb-4">Select a Conversation</h2>
                         <p className="text-zinc-500 font-medium leading-relaxed">
-                            Pick an identity to begin a high-fidelity cryptographic stream.
-                            End-to-end encryption is active for all sectors.
+                            Select a chat to start messaging. <br />
+                            Your conversations are secured with end-to-end encryption.
                         </p>
                     </motion.div>
                 </div>

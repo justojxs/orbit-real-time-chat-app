@@ -154,9 +154,10 @@ const searchMessages = asyncHandler(async (req: Request, res: Response) => {
     }
 
     try {
+        const escapedQuery = (query as string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const messages = await Message.find({
             chat: chatId,
-            content: { $regex: query as string, $options: "i" },
+            content: { $regex: escapedQuery, $options: "i" },
             isDeleted: false
         })
             .populate("sender", "name pic")

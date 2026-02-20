@@ -70,7 +70,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
     return (
         <div className={`flex flex-col items-center p-3 py-6 bg-[#0c0c0e]/40 backdrop-blur-3xl w-full md:w-[32%] h-full border-r border-white/5 ${selectedChat ? "hidden md:flex" : "flex"}`}>
             <div className="pb-6 px-4 flex w-full justify-between items-center">
-                <h1 className="text-2xl font-bold text-white tracking-tighter">Identity Stream</h1>
+                <h1 className="text-2xl font-bold text-white tracking-tighter">Messages</h1>
                 <GroupChatModal>
                     <button className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/20 hover:bg-emerald-500/20 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
                         <Plus size={14} strokeWidth={3} /> New Group
@@ -138,11 +138,11 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                                             <div className="flex justify-between items-center mt-1">
                                                 {chat.latestMessage ? (
                                                     <p className={`text-xs truncate max-w-[80%] ${selectedChat?._id === chat._id ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                                                        <span className="font-medium opacity-80">{chat.latestMessage.sender.name.split(' ')[0]}: </span>
+                                                        <span className="font-medium opacity-80">{chat.latestMessage.sender?.name?.split(' ')[0]}: </span>
                                                         {chat.latestMessage.image ? "📷 Image" : chat.latestMessage.fileUrl ? "📄 Document" : chat.latestMessage.audioUrl ? "🎤 Voice Note" : chat.latestMessage.content}
                                                     </p>
                                                 ) : (
-                                                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest opacity-60">Initialize Encryption</p>
+                                                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest opacity-60">No messages yet</p>
                                                 )}
 
                                                 {chat.unreadCount > 0 && (
