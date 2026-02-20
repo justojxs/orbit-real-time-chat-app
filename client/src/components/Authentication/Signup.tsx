@@ -2,8 +2,10 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Camera, Loader2, CheckCircle2 } from "lucide-react";
+import { useChatStore } from "../../store/useChatStore";
 
 const Signup = () => {
+    const { setUser, initSocket } = useChatStore();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [confirmpassword, setConfirmpassword] = useState("");
@@ -70,9 +72,10 @@ const Signup = () => {
             );
 
             localStorage.setItem("userInfo", JSON.stringify(data));
+            setUser(data);
+            initSocket(data);
             setLoading(false);
             navigate("/chats");
-            window.location.reload();
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message || "Unable to sign up. Please try again.";
             alert("Error Occurred: " + errorMsg);

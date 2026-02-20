@@ -1,9 +1,9 @@
-import { useChatState } from "../context/ChatProvider";
+import { useChatStore } from "../store/useChatStore";
 import SingleChat from "./SingleChat";
 import WelcomeScreen from "./WelcomeScreen";
 
 const ChatBox = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFetchAgain: any }) => {
-    const { selectedChat } = useChatState();
+    const { selectedChat } = useChatStore();
 
     return (
         <div

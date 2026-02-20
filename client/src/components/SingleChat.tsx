@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useChatState } from "../context/ChatProvider";
+import { useChatStore } from "../store/useChatStore";
 import axios from "axios";
 import ScrollableChat from "./ScrollableChat";
 import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown } from "lucide-react";
@@ -35,7 +35,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const timerRef = useRef<any>(null);
 
-    const { user, selectedChat, setSelectedChat, notification, setNotification, socket, onlineUsers } = useChatState();
+    const { user, selectedChat, setSelectedChat, notification, setNotification, socket, onlineUsers } = useChatStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const fetchMessages = async () => {

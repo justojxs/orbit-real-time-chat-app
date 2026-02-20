@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useChatState } from "../../context/ChatProvider";
+import { useChatStore } from "../../store/useChatStore";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Search, Bell, ChevronDown, X, LogOut, User as UserIcon, Loader2 } from "lucide-react";
@@ -23,7 +23,7 @@ const SideDrawer = () => {
         setNotification,
         chats,
         setChats,
-    } = useChatState();
+    } = useChatStore();
 
     const navigate = useNavigate();
 

@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useChatState } from "../context/ChatProvider";
+import { useChatStore } from "../store/useChatStore";
 import { Plus, Pin } from "lucide-react";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { motion, AnimatePresence } from "framer-motion";
 
 const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
-    const [loggedUser, setLoggedUser] = useState<any>();
     const [loading, setLoading] = useState(true);
-    const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers } = useChatState();
+    const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers } = useChatStore();
 
     const fetchChats = async () => {
         setLoading(true);
@@ -28,21 +27,20 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
     };
 
     useEffect(() => {
-        setLoggedUser(JSON.parse(localStorage.getItem("userInfo") || "null"));
         fetchChats();
     }, [fetchAgain]);
 
-    const getSender = (loggedUser: any, users: any[]) => {
-        return users[0]?._id === loggedUser?._id ? users[1]?.name : users[0]?.name;
+    const getSender = (users: any[]) => {
+        return users[0]?._id === user?._id ? users[1]?.name : users[0]?.name;
     };
 
-    const getSenderFull = (loggedUser: any, users: any[]) => {
-        return users[0]?._id === loggedUser?._id ? users[1] : users[0];
+    const getSenderFull = (users: any[]) => {
+        return users[0]?._id === user?._id ? users[1] : users[0];
     };
 
     const isUserOnline = (chat: any) => {
         if (chat.isGroupChat) return false;
-        const recipient = getSenderFull(loggedUser, chat.users);
+        const recipient = getSenderFull(chat.users);
         if (!recipient) return false;
         return onlineUsers[recipient._id]?.isOnline || recipient.isOnline;
     };
@@ -111,7 +109,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                                         <div className="relative">
                                             {!chat.isGroupChat ? (
                                                 <img
-                                                    src={getSenderFull(loggedUser, chat.users)?.pic || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"}
+                                                    src={getSenderFull(chat.users)?.pic || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"}
                                                     className="w-12 h-12 rounded-full object-cover shadow-sm border border-white/5 flex-shrink-0"
                                                     alt="avatar"
                                                 />
@@ -129,7 +127,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                                             <div className="flex justify-between items-center w-full">
                                                 <h3 className="font-semibold text-[15px] text-white truncate max-w-[70%]">
                                                     {!chat.isGroupChat
-                                                        ? getSender(loggedUser, chat.users)
+                                                        ? getSender(chat.users)
                                                         : chat.chatName}
                                                 </h3>
                                                 <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { useChatState } from "../../context/ChatProvider";
+import { useChatStore } from "../../store/useChatStore";
 import { X, Search, Users, Plus, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
@@ -12,7 +12,7 @@ const GroupChatModal = ({ isOpen, onClose, children }: { isOpen?: boolean, onClo
     const [searchResult, setSearchResult] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const { user, chats, setChats } = useChatState();
+    const { user, chats, setChats } = useChatStore();
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleOpen = () => {

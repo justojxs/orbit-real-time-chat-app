@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useChatState } from "../context/ChatProvider";
+import { useChatStore } from "../store/useChatStore";
 import SideDrawer from "../components/miscellaneous/SideDrawer";
 import MyChats from "../components/MyChats";
 import ChatBox from "../components/ChatBox";
 
 const ChatPage = () => {
-    const { user } = useChatState();
+    const { user } = useChatStore();
     const [fetchAgain, setFetchAgain] = useState(false);
 
     return (

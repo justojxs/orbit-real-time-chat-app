@@ -2,8 +2,10 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Loader2, Sparkles } from "lucide-react";
+import { useChatStore } from "../../store/useChatStore";
 
 const Login = () => {
+    const { setUser, initSocket } = useChatStore();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -31,9 +33,10 @@ const Login = () => {
             );
 
             localStorage.setItem("userInfo", JSON.stringify(data));
+            setUser(data);
+            initSocket(data);
             setLoading(false);
             navigate("/chats");
-            window.location.reload();
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message || "Unable to login. Please try again.";
             alert("Error Occurred: " + errorMsg);
@@ -91,8 +94,9 @@ const Login = () => {
                                 { headers: { "Content-type": "application/json" } }
                             );
                             localStorage.setItem("userInfo", JSON.stringify(data));
+                            setUser(data);
+                            initSocket(data);
                             navigate("/chats");
-                            window.location.reload();
                         } catch (error: any) {
                             alert("Error logging in as guest");
                         } finally {

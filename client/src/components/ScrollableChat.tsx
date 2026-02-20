@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
-import { useChatState } from "../context/ChatProvider";
+import { useChatStore } from "../store/useChatStore";
 import { Check, CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
 const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMessages }: { messages: any[], socket: any, activeMessageId?: string, searchQuery?: string, setMessages?: any }) => {
-    const { user, selectedChat } = useChatState();
+    const { user, selectedChat } = useChatStore();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
     const [openReactionId, setOpenReactionId] = useState<string | null>(null);

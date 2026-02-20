@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useChatState } from "../../context/ChatProvider";
+import { useChatStore } from "../../store/useChatStore";
 import axios from "axios";
 import { X, Pencil, Plus, LogOut, Loader2, Search, Trash2, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
     const [loading, setLoading] = useState(false);
     const [renameLoading, setRenameLoading] = useState(false);
 
-    const { selectedChat, setSelectedChat, user } = useChatState();
+    const { selectedChat, setSelectedChat, user } = useChatStore();
 
     useEffect(() => {
         if (!isOpen) {
@@ -58,7 +58,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
             }
 
             const updatedChat = data.removed;
-            user1._id === user._id ? setSelectedChat() : setSelectedChat(updatedChat);
+            user1._id === user._id ? setSelectedChat(null) : setSelectedChat(updatedChat);
             setFetchAgain(!fetchAgain);
             fetchMessages();
             setLoading(false);
