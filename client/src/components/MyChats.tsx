@@ -7,9 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
     const [loggedUser, setLoggedUser] = useState<any>();
+    const [loading, setLoading] = useState(true);
     const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers } = useChatState();
 
     const fetchChats = async () => {
+        setLoading(true);
         try {
             const config = {
                 headers: {
@@ -20,6 +22,8 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
             setChats(data);
         } catch (error) {
             console.error("Failed to fetch chats");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -80,7 +84,11 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
 
             <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar w-full">
                 <AnimatePresence initial={false}>
-                    {sortedChats.length > 0 ? (
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
+                            <div className="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    ) : sortedChats.length > 0 ? (
                         sortedChats.map((chat: any) => {
                             const isPinned = chat.pinnedBy?.includes(user?._id);
                             return (
@@ -157,8 +165,12 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                             );
                         })
                     ) : (
-                        <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
-                            <div className="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="flex flex-col items-center justify-center h-full text-zinc-500 opacity-60 text-center px-4 mt-8">
+                            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                                <Plus size={24} className="text-zinc-400" />
+                            </div>
+                            <p className="text-sm font-medium">No active connections</p>
+                            <p className="text-xs mt-1">Search for a user to start encrypting.</p>
                         </div>
                     )}
                 </AnimatePresence>

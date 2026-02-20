@@ -71,15 +71,35 @@ const fetchChats = asyncHandler(async (req: any, res: Response) => {
             select: "name pic email isOnline lastSeen",
         });
 
-        // Add unread counts for each chat
-        const chatsWithUnread = await Promise.all(results.map(async (chat: any) => {
-            const unreadCount = await Message.countDocuments({
-                chat: chat._id,
-                sender: { $ne: req.user._id },
-                readBy: { $ne: req.user._id }
-            });
-            return { ...chat.toObject(), unreadCount };
-        }));
+        const chatIds = results.map((chat: any) => chat._id);
+
+        const unreadCounts = await Message.aggregate([
+            {
+                $match: {
+                    chat: { $in: chatIds },
+                    sender: { $ne: req.user._id },
+                    readBy: { $ne: req.user._id }
+                }
+            },
+            {
+                $group: {
+                    _id: "$chat",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const unreadMap: any = {};
+        unreadCounts.forEach(item => {
+            unreadMap[item._id.toString()] = item.count;
+        });
+
+        const chatsWithUnread = results.map((chat: any) => {
+            return {
+                ...chat.toObject(),
+                unreadCount: unreadMap[chat._id.toString()] || 0
+            };
+        });
 
         res.status(200).send(chatsWithUnread);
     } catch (error: any) {
