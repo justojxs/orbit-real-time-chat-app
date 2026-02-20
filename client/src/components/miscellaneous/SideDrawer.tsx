@@ -14,11 +14,13 @@ const SideDrawer = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
 
     const {
         setSelectedChat,
         user,
         notification,
+        setNotification,
         chats,
         setChats,
     } = useChatState();
@@ -99,15 +101,57 @@ const SideDrawer = () => {
                 </div>
 
                 <div className="flex items-center gap-6">
-                    <div className="relative cursor-pointer group">
-                        <div className="hover:bg-white/[0.05] p-2.5 rounded-full transition-colors relative">
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsNotifOpen(!isNotifOpen)}
+                            className="hover:bg-white/[0.05] p-2.5 rounded-full transition-colors relative"
+                        >
                             <Bell className="text-zinc-400 group-hover:text-white transition-colors" size={20} />
                             {notification.length > 0 && (
                                 <span className="absolute top-2 right-2 bg-emerald-500 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold shadow-[0_0_10px_rgba(16,185,129,0.5)]">
                                     {notification.length}
                                 </span>
                             )}
-                        </div>
+                        </button>
+
+                        <AnimatePresence>
+                            {isNotifOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    className="absolute right-0 top-full mt-4 w-72 bg-[#0c0c0e]/90 border border-white/[0.08] rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-3xl"
+                                >
+                                    <div className="p-3">
+                                        <h3 className="px-3 pb-2 text-sm font-semibold text-zinc-400 border-b border-white/[0.05]">
+                                            Notifications
+                                        </h3>
+                                        <div className="max-h-64 overflow-y-auto mt-2">
+                                            {!notification.length && (
+                                                <div className="px-3 py-4 text-center text-zinc-500 text-sm">
+                                                    No New Messages
+                                                </div>
+                                            )}
+                                            {notification.map((notif: any) => (
+                                                <div
+                                                    key={notif._id}
+                                                    onClick={() => {
+                                                        setSelectedChat(notif.chat);
+                                                        setNotification(notification.filter((n: any) => n !== notif));
+                                                        setIsNotifOpen(false);
+                                                    }}
+                                                    className="w-full text-left px-3 py-3 hover:bg-white/[0.05] rounded-xl transition-colors cursor-pointer text-sm text-white"
+                                                >
+                                                    {notif.chat.isGroupChat
+                                                        ? `New Message in ${notif.chat.chatName}`
+                                                        : `New Message from ${notif.sender.name}`}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     <div className="relative">
