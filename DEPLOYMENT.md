@@ -57,7 +57,7 @@ Fill in these fields EXACTLY:
 | **Region** | Choose the closest to you (e.g., Singapore for India) |
 | **Root Directory** | `server` |
 | **Runtime** | `Node` |
-| **Build Command** | `npm install && npm run build` |
+| **Build Command** | `npm install --include=dev && npm run build` |
 | **Start Command** | `npm start` |
 | **Instance Type** | `Free` |
 
@@ -78,7 +78,7 @@ Scroll down to **"Environment Variables"** section and add these one by one:
 1. Click **"Create Web Service"**
 2. Render will now:
    - Clone your repo
-   - Run `npm install && npm run build` in the `server/` folder
+   - Run `npm install --include=dev && npm run build` in the `server/` folder
    - Run `npm start` (which runs `node dist/index.js`)
 3. **Wait 3-5 minutes** for the build to finish
 4. You'll see green text saying **"Your service is live 🎉"**

@@ -13,5 +13,16 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true
-  }
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "src/tests",
+    "test",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }
