@@ -20,10 +20,7 @@ dotenv.config();
 const app: Express = express();
 const httpServer = createServer(app);
 
-// Use Redis Adapter for Socket.io Distribution
-const pubClient = createClient({ url: process.env.REDIS_URL || 'redis://redis:6379' });
-const subClient = pubClient.duplicate();
-
+// Optional Redis Adapter for Socket.io (only if REDIS_URL is provided)
 const io = new Server(httpServer, {
     cors: {
         origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -31,10 +28,16 @@ const io = new Server(httpServer, {
     }
 });
 
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-    io.adapter(createAdapter(pubClient, subClient));
-    console.log("Redis Adapter Connected");
-}).catch(err => console.error("Redis Connection Error:", err));
+if (process.env.REDIS_URL) {
+    const pubClient = createClient({ url: process.env.REDIS_URL });
+    const subClient = pubClient.duplicate();
+    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+        io.adapter(createAdapter(pubClient, subClient));
+        console.log("Redis Adapter Connected");
+    }).catch(err => console.error("Redis Connection Error (non-fatal):", err));
+} else {
+    console.log("No REDIS_URL set — running Socket.io without Redis adapter (single instance mode)");
+}
 
 connectDB();
 
