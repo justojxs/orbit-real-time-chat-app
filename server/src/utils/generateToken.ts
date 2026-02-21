@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const generateToken = (id: string) => {
     return jwt.sign({ id }, process.env.JWT_SECRET || "default_secret", {
-        expiresIn: "15m", // Short-lived access token
+        expiresIn: "30d", // 30 days — frontend stores token in localStorage
     });
 };
 

@@ -24,7 +24,8 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
         origin: process.env.CLIENT_URL || "http://localhost:5173",
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
     }
 });
 
@@ -48,10 +49,10 @@ app.use(cors({
     credentials: true,
 }));
 
-// API Rate Limiting (100 requests per 15 mins)
+// API Rate Limiting (500 requests per 15 mins per IP)
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 500,
     standardHeaders: true,
     legacyHeaders: false,
     message: "Too many requests from this IP, please try again after 15 minutes"

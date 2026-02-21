@@ -102,7 +102,7 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
         res.cookie('jwt', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development', // Use secure cookies in production
-            sameSite: 'strict', // Prevent CSRF attacks
+            sameSite: process.env.NODE_ENV === 'development' ? 'strict' : 'none', // 'none' required for cross-origin (Vercel→Render)
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
