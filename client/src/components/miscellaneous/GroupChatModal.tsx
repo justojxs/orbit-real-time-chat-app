@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { useChatStore } from "../../store/useChatStore";
 import { X, Search, Users, Plus, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,7 +43,7 @@ const GroupChatModal = ({ isOpen, onClose, children }: { isOpen?: boolean, onClo
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get(`/api/user?search=${query}`, config);
+            const { data } = await api.get(`/api/user?search=${query}`, config);
             setLoading(false);
             setSearchResult(data);
         } catch (error) {
@@ -75,7 +75,7 @@ const GroupChatModal = ({ isOpen, onClose, children }: { isOpen?: boolean, onClo
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.post(
+            const { data } = await api.post(
                 "/api/chat/group",
                 {
                     name: groupChatName,

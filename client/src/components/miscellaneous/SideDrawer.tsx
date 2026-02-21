@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useChatStore } from "../../store/useChatStore";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../lib/axios";
 import { Search, Bell, ChevronDown, X, LogOut, User as UserIcon, Loader2 } from "lucide-react";
 import ProfileModal from "./ProfileModal";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,7 +51,7 @@ const SideDrawer = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get(`/api/user?search=${search}`, config);
+            const { data } = await api.get(`/api/user?search=${search}`, config);
             setLoading(false);
             setSearchResult(data);
         } catch (error) {
@@ -69,7 +69,7 @@ const SideDrawer = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.post(`/api/chat`, { userId }, config);
+            const { data } = await api.post(`/api/chat`, { userId }, config);
 
             if (!chats.find((c: any) => c._id === data._id)) setChats([data, ...chats]);
             setSelectedChat(data);

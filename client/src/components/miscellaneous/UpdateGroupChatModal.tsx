@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useChatStore } from "../../store/useChatStore";
-import axios from "axios";
+import api from "../../lib/axios";
 import { X, Pencil, Plus, LogOut, Loader2, Search, Trash2, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
@@ -44,7 +44,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 `/api/chat/groupremove`,
                 {
                     chatId: selectedChat._id,
@@ -78,7 +78,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 `/api/chat/rename`,
                 {
                     chatId: selectedChat._id,
@@ -111,7 +111,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get(`/api/user?search=${query}`, config);
+            const { data } = await api.get(`/api/user?search=${query}`, config);
             setLoading(false);
             setSearchResult(data);
         } catch (error) {
@@ -138,7 +138,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 `/api/chat/groupadd`,
                 {
                     chatId: selectedChat._id,

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
-import axios from "axios";
+import api from "../lib/axios";
 import ScrollableChat from "./ScrollableChat";
 import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,7 +47,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                 },
             };
             setLoading(true);
-            const { data } = await axios.get(
+            const { data } = await api.get(
                 `/api/message/${selectedChat._id}`,
                 config
             );
@@ -141,7 +141,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             }
 
             setNewMessage("");
-            const { data } = await axios.post("/api/message", payload, config);
+            const { data } = await api.post("/api/message", payload, config);
             socket.emit("new message", data);
             setMessages([...messages, data]);
             setUploadingFile(false);
@@ -245,7 +245,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                 payload.fileType = file.type;
             }
 
-            const { data: messageData } = await axios.post("/api/message", payload, config);
+            const { data: messageData } = await api.post("/api/message", payload, config);
 
             socket.emit("new message", messageData);
             setMessages((prev) => [...prev, messageData]);

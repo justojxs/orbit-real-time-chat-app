@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Camera, Loader2, CheckCircle2 } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
@@ -65,7 +65,7 @@ const Signup = () => {
                 },
             };
 
-            const { data } = await axios.post(
+            const { data } = await api.post(
                 "/api/user",
                 { name, email, password, pic },
                 config

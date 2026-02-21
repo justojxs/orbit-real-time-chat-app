@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Loader2, Sparkles } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
@@ -26,7 +26,7 @@ const Login = () => {
                 },
             };
 
-            const { data } = await axios.post(
+            const { data } = await api.post(
                 "/api/user/login",
                 { email, password },
                 config
@@ -88,7 +88,7 @@ const Login = () => {
                     onClick={async () => {
                         setLoading(true);
                         try {
-                            const { data } = await axios.post(
+                            const { data } = await api.post(
                                 "/api/user/login",
                                 { email: "guest@example.com", password: "123456" },
                                 { headers: { "Content-type": "application/json" } }

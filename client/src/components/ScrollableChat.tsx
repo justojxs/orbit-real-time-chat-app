@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Check, CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import api from "../lib/axios";
 
 const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMessages }: { messages: any[], socket: any, activeMessageId?: string, searchQuery?: string, setMessages?: any }) => {
     const { user, selectedChat } = useChatStore();
@@ -32,7 +32,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.put("/api/message/react", { messageId, emoji }, config);
+            const { data } = await api.put("/api/message/react", { messageId, emoji }, config);
             if (setMessages) {
                 setMessages((prev: any[]) => prev.map(msg => msg._id === messageId ? { ...msg, reactions: data.reactions } : msg));
             }
@@ -59,7 +59,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await axios.put("/api/message/delete", { messageId }, config);
+            await api.put("/api/message/delete", { messageId }, config);
             socket.emit("message deleted", { messageId, chatId: selectedChat._id });
         } catch (error) {
             console.error("Delete error:", error);

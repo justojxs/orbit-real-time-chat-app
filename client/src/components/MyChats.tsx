@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { useChatStore } from "../store/useChatStore";
 import { Plus, Pin } from "lucide-react";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
@@ -17,7 +17,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get("/api/chat", config);
+            const { data } = await api.get("/api/chat", config);
             setChats(data);
         } catch (error) {
             console.error("Failed to fetch chats");
@@ -53,7 +53,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            await axios.put("/api/chat/pin", { chatId }, config);
+            await api.put("/api/chat/pin", { chatId }, config);
             fetchChats(); // Refresh
         } catch (error) {
             console.error("Failed to pin chat");

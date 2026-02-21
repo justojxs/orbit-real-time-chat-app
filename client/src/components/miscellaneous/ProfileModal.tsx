@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Camera, Loader2, User as UserIcon, Lock, Mail, ShieldCheck } from "lucide-react";
-import axios from "axios";
-import { useChatState } from "../../context/ChatProvider";
+import api from "../../lib/axios";
+import { useChatStore } from "../../store/useChatStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 
@@ -13,7 +13,7 @@ interface ProfileModalProps {
 }
 
 const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileModalProps) => {
-    const { user: loggedInUser, setUser } = useChatState();
+    const { user: loggedInUser, setUser } = useChatStore();
     const isCurrentUser = displayUser?._id === loggedInUser?._id;
 
     const [isEditing, setIsEditing] = useState(false);
@@ -70,7 +70,7 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                 },
             };
 
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 "/api/user/profile",
                 { name, password, pic },
                 config
