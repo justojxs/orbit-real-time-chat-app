@@ -3,6 +3,10 @@ import User from "../models/userModel";
 import generateToken, { generateRefreshToken } from "../utils/generateToken";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 
 //@description     Get or Search all users
 //@route           GET /api/user?search=
@@ -176,4 +180,70 @@ const updateUserProfile = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-export { allUsers, registerUser, authUser, refreshAccessToken, updateUserProfile };
+// @description     Auth the user with Google
+// @route           POST /api/user/google
+// @access          Public
+const authGoogleUser = asyncHandler(async (req: Request, res: Response) => {
+    const { token } = req.body;
+
+    if (!token) {
+        res.status(400);
+        throw new Error("No token provided");
+    }
+
+    if (!process.env.GOOGLE_CLIENT_ID) {
+        console.warn("GOOGLE_CLIENT_ID is not set in environment variables!");
+        res.status(500);
+        throw new Error("Google Login is not fully configured on the server yet");
+    }
+
+    let payload;
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        payload = ticket.getPayload();
+    } catch (error) {
+        res.status(400);
+        throw new Error("Invalid or expired Google Token");
+    }
+
+    if (!payload || !payload.email) {
+        res.status(400);
+        throw new Error("Google Login failed (no email found)");
+    }
+
+    let user: any = await User.findOne({ email: payload.email });
+
+    if (!user) {
+        // Create automatic account
+        user = await User.create({
+            name: payload.name || "Google User",
+            email: payload.email,
+            password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8), // Strong random password
+            pic: payload.picture || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+        });
+    }
+
+    const refreshToken = generateRefreshToken(user._id.toString());
+
+    // Set Refresh Token Cookie
+    res.cookie('jwt', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development', // Use secure cookies in production
+        sameSite: process.env.NODE_ENV === 'development' ? 'strict' : 'none', // 'none' required for cross-origin
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        pic: user.pic,
+        token: generateToken(user._id.toString()),
+    });
+});
+
+export { allUsers, registerUser, authUser, refreshAccessToken, updateUserProfile, authGoogleUser };

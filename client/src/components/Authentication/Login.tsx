@@ -3,6 +3,7 @@ import api from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Loader2, Sparkles } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
     const { setUser, initSocket } = useChatStore();
@@ -39,6 +40,27 @@ const Login = () => {
             navigate("/chats");
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message || "Unable to login. Please try again.";
+            alert("Error Occurred: " + errorMsg);
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        setLoading(true);
+        try {
+            const { data } = await api.post(
+                "/api/user/google",
+                { token: credentialResponse.credential },
+                { headers: { "Content-type": "application/json" } }
+            );
+
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            setUser(data);
+            initSocket(data);
+            setLoading(false);
+            navigate("/chats");
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.message || error.message || "Google Login failed";
             alert("Error Occurred: " + errorMsg);
             setLoading(false);
         }
@@ -107,6 +129,26 @@ const Login = () => {
                     <Sparkles className="text-zinc-700 group-hover:text-emerald-500 transition-colors" size={14} />
                     Start As Guest User
                 </button>
+
+                <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-white/5"></span>
+                    </div>
+                    <div className="relative flex justify-center text-[9px] font-bold uppercase tracking-widest">
+                        <span className="bg-[#09090b] px-4 text-zinc-500">Or continue with</span>
+                    </div>
+                </div>
+
+                <div className="w-full flex justify-center pt-2 [&>div]:w-full [&>div>div]:!pr-0 [&>div>div]:!pl-0 [&>div>div]:w-full [&>div>div]:!w-full [&_iframe]:!w-full">
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => alert('Google Login Failed')}
+                        theme="filled_black"
+                        shape="pill"
+                        text="signin_with"
+                        width="100%"
+                    />
+                </div>
             </div>
         </div>
     );

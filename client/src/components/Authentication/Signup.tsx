@@ -3,6 +3,7 @@ import api from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Camera, Loader2, CheckCircle2 } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Signup = () => {
     const { setUser, initSocket } = useChatStore();
@@ -78,6 +79,27 @@ const Signup = () => {
             navigate("/chats");
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message || "Unable to sign up. Please try again.";
+            alert("Error Occurred: " + errorMsg);
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        setLoading(true);
+        try {
+            const { data } = await api.post(
+                "/api/user/google",
+                { token: credentialResponse.credential },
+                { headers: { "Content-type": "application/json" } }
+            );
+
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            setUser(data);
+            initSocket(data);
+            setLoading(false);
+            navigate("/chats");
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.message || error.message || "Google Signup failed";
             alert("Error Occurred: " + errorMsg);
             setLoading(false);
         }
@@ -163,13 +185,35 @@ const Signup = () => {
                 </div>
             </div>
 
-            <button
-                onClick={submitHandler}
-                disabled={loading}
-                className="btn-primary w-full flex items-center justify-center gap-2 mt-4"
-            >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Account"}
-            </button>
+            <div className="pt-2">
+                <button
+                    onClick={submitHandler}
+                    disabled={loading}
+                    className="btn-primary w-full flex items-center justify-center gap-2 mt-4"
+                >
+                    {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Account"}
+                </button>
+
+                <div className="relative py-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-white/5"></span>
+                    </div>
+                    <div className="relative flex justify-center text-[9px] font-bold uppercase tracking-widest">
+                        <span className="bg-[#09090b] px-4 text-zinc-500">Or continue with</span>
+                    </div>
+                </div>
+
+                <div className="w-full flex justify-center [&>div]:w-full [&>div>div]:!pr-0 [&>div>div]:!pl-0 [&>div>div]:w-full [&>div>div]:!w-full [&_iframe]:!w-full">
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => alert('Google Signup Failed')}
+                        theme="filled_black"
+                        shape="pill"
+                        text="signup_with"
+                        width="100%"
+                    />
+                </div>
+            </div>
         </div>
     );
 };
