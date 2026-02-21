@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { Check, CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucide-react";
+import { CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../lib/axios";
 
@@ -239,9 +239,9 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                     {isMyMessage && !m.isDeleted && (
                                                         <span className="flex items-center">
                                                             {m.readBy && (selectedChat.isGroupChat ? m.readBy.length >= selectedChat.users.length : m.readBy.length > 1) ? (
-                                                                <CheckCheck size={16} className="text-emerald-300 stroke-[2.5]" />
+                                                                <CheckCheck size={16} className="text-blue-400 stroke-[2.5]" />
                                                             ) : (
-                                                                <Check size={16} className="text-white/80 stroke-[2.5]" />
+                                                                <CheckCheck size={16} className="text-gray-400 stroke-[2.5]" />
                                                             )}
                                                         </span>
                                                     )}
