@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import api from "../lib/axios";
 import ScrollableChat from "./ScrollableChat";
-import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown, Sparkles, Palette } from "lucide-react";
+import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown, Sparkles, Wand2, PenTool } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
@@ -529,13 +529,22 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
 
                         <div className="flex items-center gap-2">
                             <button
+                                onClick={() => setIsWhiteboardOpen(true)}
+                                disabled={uploadingFile}
+                                title="Live Collaborative Whiteboard"
+                                className="px-3 py-1.5 text-blue-400 hover:text-white transition-all bg-gradient-to-r from-blue-500/10 to-indigo-500/10 hover:from-blue-500/20 hover:to-indigo-500/20 rounded-xl border border-blue-500/20 hover:border-blue-400/50 hidden sm:flex items-center gap-2 group disabled:opacity-50"
+                            >
+                                <PenTool size={16} className="group-hover:-rotate-12 transition-transform" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest hidden lg:inline">Live Whiteboard</span>
+                            </button>
+                            <button
                                 onClick={handleCatchMeUp}
                                 disabled={isSummarizing || messages.length === 0}
                                 title="Catch Me Up (AI Summary)"
-                                className="p-2 text-emerald-400 hover:text-white transition-colors bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/20 hover:border-emerald-500/40 hidden sm:flex items-center gap-2 group disabled:opacity-50"
+                                className="px-3 py-1.5 text-emerald-300 hover:text-white transition-all bg-gradient-to-r from-emerald-500/20 to-teal-400/20 hover:from-emerald-500/30 hover:to-teal-400/30 rounded-xl border border-emerald-500/30 hover:border-emerald-400/60 hidden sm:flex items-center gap-2 group disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                             >
-                                {isSummarizing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="group-hover:animate-pulse" />}
-                                <span className="text-[10px] font-bold uppercase tracking-widest hidden lg:inline">Catch Me Up</span>
+                                {isSummarizing ? <Loader2 size={16} className="animate-spin text-emerald-200" /> : <Wand2 size={16} className="group-hover:rotate-12 transition-transform text-emerald-200" />}
+                                <span className="text-[10px] font-black uppercase tracking-widest hidden lg:inline text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-teal-200">Catch Me Up</span>
                             </button>
                             <AnimatePresence>
                                 {isSearchOpen && (
@@ -709,14 +718,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                     disabled={uploadingFile}
                                 >
                                     <Paperclip size={20} className={uploadingFile ? "animate-pulse" : ""} />
-                                </button>
-                                <button
-                                    className="text-zinc-500 hover:text-emerald-400 transition-colors p-2"
-                                    onClick={() => setIsWhiteboardOpen(true)}
-                                    title="Live Whiteboard"
-                                    disabled={uploadingFile}
-                                >
-                                    <Palette size={20} />
                                 </button>
                                 <input
                                     type="file"

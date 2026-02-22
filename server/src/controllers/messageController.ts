@@ -203,7 +203,7 @@ const summarizeChat = asyncHandler(async (req: any, res: Response) => {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
         const prompt = `Please summarize the following chat transcript concisely in 3 bullet points. Focus on the main topics, agreements, and key details.\n\nTranscript:\n${transcript}`;
 
