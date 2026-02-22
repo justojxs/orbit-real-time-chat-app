@@ -418,6 +418,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         setSearchResults(null);
         setActiveSearchIndex(-1);
         setChatSummary(null);
+
+        // Clear notifications for this chat when it's opened
+        if (selectedChat) {
+            setNotification(notification.filter((n: any) => n.chat._id !== selectedChat._id));
+        }
     }, [selectedChat, socket]);
 
     const typingHandler = (e: any) => {

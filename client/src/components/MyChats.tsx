@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
     const [loading, setLoading] = useState(true);
-    const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers } = useChatStore();
+    const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers, notification } = useChatStore();
 
     const fetchChats = async () => {
         setLoading(true);
@@ -151,7 +151,11 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                                                     <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest opacity-60">No messages yet</p>
                                                 )}
 
-
+                                                {notification.filter((n: any) => n.chat._id === chat._id).length > 0 && selectedChat?._id !== chat._id && (
+                                                    <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)] shrink-0 ml-2">
+                                                        <span className="text-[10px] text-white font-bold">{notification.filter((n: any) => n.chat._id === chat._id).length}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
