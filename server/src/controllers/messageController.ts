@@ -195,11 +195,10 @@ const summarizeChat = asyncHandler(async (req: any, res: Response) => {
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
-            setTimeout(() => {
-                res.json({
-                    summary: "✨ **AI Summary (Simulated)**\nBecause you haven't set `GEMINI_API_KEY` in `.env` yet, here is a mock summary:\n\n• The group discussed recent project updates.\n• Someone shared an attachment regarding the new design.\n• Participants agreed to catch up later this week to finalize details."
-                });
-            }, 1500); // Simulate API delay
+            await new Promise(r => setTimeout(r, 1500)); // Simulate API delay
+            res.json({
+                summary: "✨ **AI Summary (Simulated)**\nBecause you haven't set `GEMINI_API_KEY` in `.env` yet, here is a mock summary:\n\n• The group discussed recent project updates.\n• Someone shared an attachment regarding the new design.\n• Participants agreed to catch up later this week to finalize details."
+            });
             return;
         }
 

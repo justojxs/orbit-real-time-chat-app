@@ -578,7 +578,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                     initial={{ opacity: 0, y: -20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -20 }}
-                                    className="absolute top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-zinc-900/95 backdrop-blur-xl border border-emerald-500/30 p-6 rounded-3xl z-40 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                                    className="absolute top-4 inset-x-0 mx-auto w-[90%] max-w-2xl bg-zinc-900/95 backdrop-blur-xl border border-emerald-500/30 p-6 rounded-3xl z-40 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-3">
