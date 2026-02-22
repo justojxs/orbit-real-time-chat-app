@@ -89,7 +89,7 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
         }
     };
 
-    const uploadToCloudinary = async (file: string) => {
+    const uploadToCloudinary = async (file: File) => {
         const data = new FormData();
         data.append("file", file);
         data.append("upload_preset", "chat-app");

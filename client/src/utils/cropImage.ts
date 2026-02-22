@@ -33,7 +33,7 @@ export default async function getCroppedImg(
     pixelCrop: any,
     rotation = 0,
     flip = { horizontal: false, vertical: false }
-): Promise<string | null> {
+): Promise<File | null> {
     const image = await createImage(imageSrc)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
@@ -88,6 +88,19 @@ export default async function getCroppedImg(
         pixelCrop.height
     )
 
-    // As a base64 string
-    return croppedCanvas.toDataURL('image/jpeg', 0.9);
+    const dataUrl = croppedCanvas.toDataURL('image/jpeg', 0.9);
+
+    // Convert base64 DataURL to File object
+    const arr = dataUrl.split(',');
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], 'profile_pic.jpg', { type: mime });
 }
