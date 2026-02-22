@@ -2,10 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import api from "../lib/axios";
 import ScrollableChat from "./ScrollableChat";
-import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown } from "lucide-react";
+import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown, Sparkles, Palette } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
+import WhiteboardModal from "./WhiteboardModal";
 
 let selectedChatCompare: any;
 
@@ -20,6 +21,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const [filePreview, setFilePreview] = useState<{ name: string, type: string } | null>(null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isGroupOpen, setIsGroupOpen] = useState(false);
+    const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
+
+    // AI Summary States
+    const [isSummarizing, setIsSummarizing] = useState(false);
+    const [chatSummary, setChatSummary] = useState<string | null>(null);
 
     // Search States
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -58,6 +64,25 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             setFetchAgain(!fetchAgain); // Force MyChats to refresh unread counts instantly
         } catch (error: any) {
             console.error("Fetch messages error:", error);
+        }
+    };
+
+    const handleCatchMeUp = async () => {
+        if (!selectedChat) return;
+        setIsSummarizing(true);
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            const { data } = await api.get(`/api/message/summary/${selectedChat._id}`, config);
+            setChatSummary(data.summary);
+        } catch (error) {
+            console.error("Summary error:", error);
+            setChatSummary("Failed to generate summary. Please try again.");
+        } finally {
+            setIsSummarizing(false);
         }
     };
 
@@ -261,6 +286,61 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
+    const handleWhiteboardSend = async (dataUrl: string) => {
+        if (!socket) return;
+        setUploadingFile(true);
+
+        // Convert base64 dataUrl to File object
+        const arr = dataUrl.split(',');
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        const file = new File([u8arr], 'whiteboard.jpg', { type: mime });
+
+        const data = new FormData();
+        data.append("file", file);
+        data.append("upload_preset", "chat-app");
+        data.append("cloud_name", "dtga8lwj3");
+
+        try {
+            const res = await fetch(`https://api.cloudinary.com/v1_1/dtga8lwj3/image/upload`, {
+                method: "POST",
+                body: data,
+            });
+            if (!res.ok) throw new Error("Cloudinary upload failed");
+            const cloudData = await res.json();
+            const fileUrl = cloudData.secure_url || cloudData.url;
+
+            const config = {
+                headers: {
+                    "Content-type": "application/json",
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+
+            const payload: any = {
+                chatId: selectedChat._id,
+                content: "",
+                image: fileUrl
+            };
+
+            const { data: messageData } = await api.post("/api/message", payload, config);
+
+            socket.emit("new message", messageData);
+            setMessages((prev) => [...prev, messageData]);
+        } catch (error: any) {
+            console.error("Board Upload error:", error);
+            alert("Failed to send whiteboard");
+        } finally {
+            setUploadingFile(false);
+        }
+    };
+
     useEffect(() => {
         if (!socket) return;
 
@@ -337,6 +417,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         setSearchQuery("");
         setSearchResults(null);
         setActiveSearchIndex(-1);
+        setChatSummary(null);
     }, [selectedChat, socket]);
 
     const typingHandler = (e: any) => {
@@ -447,6 +528,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                         </div>
 
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={handleCatchMeUp}
+                                disabled={isSummarizing || messages.length === 0}
+                                title="Catch Me Up (AI Summary)"
+                                className="p-2 text-emerald-400 hover:text-white transition-colors bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/20 hover:border-emerald-500/40 hidden sm:flex items-center gap-2 group disabled:opacity-50"
+                            >
+                                {isSummarizing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} className="group-hover:animate-pulse" />}
+                                <span className="text-[10px] font-bold uppercase tracking-widest hidden lg:inline">Catch Me Up</span>
+                            </button>
                             <AnimatePresence>
                                 {isSearchOpen && (
                                     <motion.div
@@ -482,6 +572,32 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                     </div>
 
                     <div className="flex-1 flex flex-col w-full overflow-hidden relative bg-black/10">
+                        <AnimatePresence>
+                            {chatSummary && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="absolute top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-zinc-900/95 backdrop-blur-xl border border-emerald-500/30 p-6 rounded-3xl z-40 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-emerald-500/20 rounded-xl">
+                                                <Sparkles className="text-emerald-400" size={20} />
+                                            </div>
+                                            <h3 className="text-emerald-400 font-bold tracking-tight text-lg">AI Chat Summary</h3>
+                                        </div>
+                                        <button onClick={() => setChatSummary(null)} className="text-zinc-500 hover:text-white transition-colors bg-white/5 p-2 rounded-full">
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                    <div className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
+                                        {chatSummary}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         {loading ? (
                             <div className="flex flex-col items-center justify-center h-full gap-4">
                                 <Loader2 className="animate-spin text-emerald-500/50" size={32} />
@@ -594,6 +710,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                 >
                                     <Paperclip size={20} className={uploadingFile ? "animate-pulse" : ""} />
                                 </button>
+                                <button
+                                    className="text-zinc-500 hover:text-emerald-400 transition-colors p-2"
+                                    onClick={() => setIsWhiteboardOpen(true)}
+                                    title="Live Whiteboard"
+                                    disabled={uploadingFile}
+                                >
+                                    <Palette size={20} />
+                                </button>
                                 <input
                                     type="file"
                                     className="hidden"
@@ -624,6 +748,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                             </div>
                         </div>
                     </div>
+
+                    <WhiteboardModal
+                        isOpen={isWhiteboardOpen}
+                        onClose={() => setIsWhiteboardOpen(false)}
+                        socket={socket}
+                        chatId={selectedChat._id}
+                        onSend={handleWhiteboardSend}
+                    />
 
                     <ProfileModal
                         user={getSenderFull(user, selectedChat.users)}

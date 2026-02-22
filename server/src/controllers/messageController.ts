@@ -3,6 +3,7 @@ import Message from "../models/messageModel";
 import User from "../models/userModel";
 import Chat from "../models/chatModel";
 import { Request, Response } from "express";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 //@description     Get all Messages
 //@route           GET /api/Message/:chatId
@@ -169,4 +170,53 @@ const searchMessages = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-export { allMessages, sendMessage, deleteMessage, reactToMessage, searchMessages };
+//@description     Summarize Chat Messages
+//@route           GET /api/Message/:chatId/summary
+//@access          Protected
+const summarizeChat = asyncHandler(async (req: any, res: Response) => {
+    try {
+        const { chatId } = req.params;
+
+        // Fetch last 50 messages
+        const messages = await Message.find({ chat: chatId, isDeleted: false })
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .populate("sender", "name");
+
+        if (!messages || messages.length === 0) {
+            res.json({ summary: "No messages to summarize yet." });
+            return;
+        }
+
+        // Reverse to chronological order
+        messages.reverse();
+
+        const transcript = messages.map((m: any) => `${m.sender.name}: ${m.content || '[attachment/image]'}`).join('\n');
+
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            setTimeout(() => {
+                res.json({
+                    summary: "✨ **AI Summary (Simulated)**\nBecause you haven't set `GEMINI_API_KEY` in `.env` yet, here is a mock summary:\n\n• The group discussed recent project updates.\n• Someone shared an attachment regarding the new design.\n• Participants agreed to catch up later this week to finalize details."
+                });
+            }, 1500); // Simulate API delay
+            return;
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const prompt = `Please summarize the following chat transcript concisely in 3 bullet points. Focus on the main topics, agreements, and key details.\n\nTranscript:\n${transcript}`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        res.json({ summary: text });
+    } catch (error: any) {
+        console.error("AI Summary Error:", error);
+        res.status(500).json({ summary: "Sorry, I couldn't summarize the chat at this moment." });
+    }
+});
+
+export { allMessages, sendMessage, deleteMessage, reactToMessage, searchMessages, summarizeChat };
