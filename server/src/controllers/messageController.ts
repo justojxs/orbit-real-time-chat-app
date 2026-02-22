@@ -5,9 +5,9 @@ import Chat from "../models/chatModel";
 import { Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-//@description     Get all Messages
-//@route           GET /api/Message/:chatId
-//@access          Protected
+// Fetches all messages for a specific chat room.
+// It populates the sender details, chat specific data, and user reaction details so the UI can have comprehensive data.
+// Rejects requests if an error occurs while fetching.
 const allMessages = asyncHandler(async (req: Request, res: Response) => {
     try {
         const messages = await Message.find({ chat: req.params.chatId })
@@ -22,9 +22,10 @@ const allMessages = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-//@description     Create New Message
-//@route           POST /api/Message/
-//@access          Protected
+// Creates a new message entry in the database.
+// Maps incoming attachments like image, file url, or audio notes to the newly instantiated Message.
+// Updates the corresponding Chat's 'latestMessage' so the main chat list preview is kept fresh.
+// Replies with the created message payload populated with complete sender details.
 const sendMessage = asyncHandler(async (req: any, res: Response) => {
     const { content, chatId, image, fileUrl, fileName, fileType, audioUrl, audioDuration } = req.body;
 
@@ -66,9 +67,9 @@ const sendMessage = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-//@description     Delete Message
-//@route           PUT /api/Message/delete
-//@access          Protected
+// Deletes a specified message by masking its content.
+// Instead of hard-deleting the database row, it toggles an `isDeleted` flag and obscures the text.
+// This allows the front-end to safely display "This message was deleted" while preserving history structure.
 const deleteMessage = asyncHandler(async (req: any, res: Response) => {
     const { messageId } = req.body;
 
@@ -95,9 +96,10 @@ const deleteMessage = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-//@description     Add Reaction to Message
-//@route           PUT /api/Message/react
-//@access          Protected
+// Adds or removes an emoji reaction from a specific message.
+// Reverses a reaction if the user has already tapped it (toggling it on/off).
+// Allows the front-end to update state cleanly via optimistic updates.
+// Returns the newly updated message with the latest full reaction counts.
 const reactToMessage = asyncHandler(async (req: any, res: Response) => {
     const { messageId, emoji } = req.body;
 
@@ -140,9 +142,9 @@ const reactToMessage = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-//@description     Search Messages in a Chat
-//@route           GET /api/Message/search/:chatId?query=...
-//@access          Protected
+// Handles backend search mechanism explicitly scoping query hits to a discrete chat ID.
+// Rejects invalid null queries gracefully to avoid expensive database lookups.
+// Returns all non-deleted messages whose content matches via regex evaluation.
 const searchMessages = asyncHandler(async (req: Request, res: Response) => {
     const { chatId } = req.params;
     const { query } = req.query;
@@ -170,9 +172,9 @@ const searchMessages = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-//@description     Summarize Chat Messages
-//@route           GET /api/Message/:chatId/summary
-//@access          Protected
+// Generates an automated recap of conversational context using Google generative APIs.
+// If an explicit transcript is passed, it summarizes just that batch instead of performing a database lookup.
+// Designed with fallback delays locally if the configuration keys are inadvertently missing.
 const summarizeChat = asyncHandler(async (req: any, res: Response) => {
     try {
         const { chatId } = req.params;
@@ -201,7 +203,7 @@ const summarizeChat = asyncHandler(async (req: any, res: Response) => {
         if (!apiKey) {
             await new Promise(r => setTimeout(r, 1500)); // Simulate API delay
             res.json({
-                summary: "✨ **AI Summary (Simulated)**\nBecause you haven't set `GEMINI_API_KEY` in `.env` yet, here is a mock summary:\n\n• The group discussed recent project updates.\n• Someone shared an attachment regarding the new design.\n• Participants agreed to catch up later this week to finalize details."
+                summary: "Because the backend is missing the required API keys, here is a mock response.\n\n• The group discussed recent project updates.\n• Someone shared an attachment regarding the new design.\n• Participants agreed to catch up later this week to finalize details."
             });
             return;
         }

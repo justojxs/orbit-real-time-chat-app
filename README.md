@@ -50,5 +50,5 @@ Run the entire production-grade cluster locally:
 docker-compose up --build
 ```
 
----
-For deep architectural details, check [README-PRO.md](./README-PRO.md)
+--
+Built by Ojas Gupta DTU 23/CS/290

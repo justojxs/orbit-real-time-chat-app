@@ -15,11 +15,14 @@ const HomePage = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Intercepts hero button presses to smoothly slide the user down to the authentication panels.
     const scrollToAuth = () => {
         const authSection = document.getElementById("auth-section");
         authSection?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // Dynamically mounts the correct authentication sub-component (Login vs Signup) driven by user state.
+    // Encapsulates the outer Framer Motion layout styling necessary for the entry effect.
     const renderAuth = (type: "login" | "signup") => (
         <motion.div
             initial={{ opacity: 0, y: 40 }}

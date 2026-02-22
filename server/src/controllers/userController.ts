@@ -8,9 +8,9 @@ import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 
-//@description     Get or Search all users
-//@route           GET /api/user?search=
-//@access          Public
+// Processes search queries to return a list of users matching a given keyword.
+// Filters out the currently logged-in user from the results.
+// Often used in the front-end when searching for participants to start a new chat with.
 const allUsers = asyncHandler(async (req: any, res: Response) => {
     const keyword = req.query.search
         ? {
@@ -25,9 +25,9 @@ const allUsers = asyncHandler(async (req: any, res: Response) => {
     res.send(users);
 });
 
-//@description     Register new user
-//@route           POST /api/user/
-//@access          Public
+// Handles the core registration logic for new accounts.
+// Parses requested fields, validates against duplicate emails, hashes the password via pre-save hooks,
+// and issues a fresh JWT acting securely as the primary means of session state.
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
     const { name, email, password, pic } = req.body;
 
@@ -65,9 +65,9 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-//@description     Auth the user
-//@route           POST /api/user/login
-//@access          Public
+// Authenticates a user based on email and password.
+// Explicitly handles the guest login workflow to quickly jumpstart trials by auto-generating dummy chats.
+// Issues standard auth metadata payloads back to the client along with HTTP-only scoped refresh tokens.
 const authUser = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
@@ -124,9 +124,8 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-// @description     Refresh Access Token
-// @route           POST /api/user/refresh
-// @access          Public (with cookie)
+// Generates a renewed access token from an interceptor request cleanly without prompting the user.
+// Safely pulls from a pre-established HTTP-only cookie containing the 'jwt' refresh token string.
 const refreshAccessToken = asyncHandler(async (req: Request, res: Response) => {
     const cookies = req.cookies;
 
@@ -150,9 +149,9 @@ const refreshAccessToken = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-// @description     Update User Profile
-// @route           PUT /api/user/profile
-// @access          Private
+// Modifies specific properties on the requester's profile entity.
+// Fields can optionally include an image URL, full name payload, or even a brand-new raw password payload.
+// If the password is provided, mongoose middleware cleanly intercepts and hashes it again.
 const updateUserProfile = asyncHandler(async (req: any, res: Response) => {
     if (!req.user || !req.user._id) {
         res.status(401).json({ message: "Not authorized" });
@@ -184,9 +183,9 @@ const updateUserProfile = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-// @description     Auth the user with Google
-// @route           POST /api/user/google
-// @access          Public
+// Accepts a temporary Google ID token from the frontend and securely verifies it against Google's Auth servers locally.
+// If the account does not yet exist within Mongo, it seamlessly creates a phantom SSO account dynamically.
+// Finalizes session configuration by appending the HTTP-only scope token onto the returning client request array.
 const authGoogleUser = asyncHandler(async (req: Request, res: Response) => {
     const { token } = req.body;
 

@@ -25,6 +25,8 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
 
     const COMMON_REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
+    // Dispatches a chosen emoji reaction for a specific message to the backend.
+    // Emits the state change across the active socket room ensuring all connected clients see the reaction instantly.
     const handleReact = async (messageId: string, emoji: string) => {
         try {
             const config = {
@@ -42,6 +44,9 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
         }
     };
 
+    // Processes permanent message deletion requests.
+    // Applies an optimistic UI update replacing the content text locally before the network roundtrip completes.
+    // Propagates the deletion instruction to the database and across the socket session.
     const confirmDelete = async () => {
         if (!messageToDelete) return;
         const messageId = messageToDelete;
@@ -66,6 +71,8 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
         }
     };
 
+    // Parses a given chat message body and wraps any characters matching the current search pattern.
+    // Dynamically highlights matching substrings with an emerald background span to aid visual navigation.
     const highlightText = (text: string, highlight: string) => {
         if (!highlight.trim()) return text;
         const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

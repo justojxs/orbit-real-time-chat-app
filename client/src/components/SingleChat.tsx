@@ -23,19 +23,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const [isGroupOpen, setIsGroupOpen] = useState(false);
     const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
     const [firstUnreadId, setFirstUnreadId] = useState<string | null>(null);
-
-    // AI Summary States
     const [isSummarizing, setIsSummarizing] = useState(false);
     const [chatSummary, setChatSummary] = useState<string | null>(null);
     const [isCatchMeUpOpen, setIsCatchMeUpOpen] = useState(false);
-
-    // Search States
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[] | null>(null);
     const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
-
-    // Recording States
     const [isRecording, setIsRecording] = useState(false);
     const [recordingDuration, setRecordingDuration] = useState(0);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -46,6 +40,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const { user, selectedChat, setSelectedChat, notification, setNotification, socket, onlineUsers } = useChatStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Bootstraps initial chat load by hitting the backend message index endpoint.
+    // Explicitly computes read/unread deltas upon fetch to display unread dividers.
     const fetchMessages = async () => {
         if (!selectedChat || !socket) return;
         try {
@@ -77,6 +73,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
+    // Core summarizer handler triggering context generation.
+    // Slices local message datasets depending on whether the user requests 'today' vs 'unread'.
+    // Dispatches the refined transcript over POST for robust LLM processing.
     const handleCatchMeUp = async (type: "unread" | "today") => {
         if (!selectedChat) return;
         setIsCatchMeUpOpen(false);
@@ -124,6 +123,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
+    // Triggers local client-side string permutation searches.
+    // Avoids network roundtrips by leveraging already populated message arrays inline.
     const handleSearch = (query: string) => {
         setSearchQuery(query);
         if (!query.trim()) {
@@ -163,6 +164,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
+    // Transmits outgoing messages, evaluating if they represent media or simple text strings.
+    // Handles multi-part data uploads to external providers like Cloudinary before forwarding the final URL.
     const sendMessage = async (event?: any) => {
         if ((event && event.key !== "Enter") && event.type !== "click") return;
         if (!newMessage.trim() && !imagePreview && !filePreview && !audioBlob) return;
@@ -215,7 +218,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
-    // Recording Logic
+    // Configures the user's local microphone streaming tracks constraints.
+    // Buffers arbitrary voice memo lengths aggressively using Opus codec compression formats.
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });

@@ -9,6 +9,8 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
     const [loading, setLoading] = useState(true);
     const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers, notification } = useChatStore();
 
+    // Fetches the user's list of active chat connections from the server.
+    // Handles authorization payload requirements and triggers the loader state while fetching.
     const fetchChats = async () => {
         setLoading(true);
         try {
@@ -30,14 +32,20 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
         fetchChats();
     }, [fetchAgain]);
 
+    // Resolves a basic string name representing the other participant in a one-on-one chat.
+    // Relies on simple ID mapping to verify against the local connected user instance.
     const getSender = (users: any[]) => {
         return users[0]?._id === user?._id ? users[1]?.name : users[0]?.name;
     };
 
+    // Extracts the entire user object containing the counterpart details from a one-on-one chat context array.
+    // Useful for scenarios requiring the recipient's image profile, online status, or deeper nested props.
     const getSenderFull = (users: any[]) => {
         return users[0]?._id === user?._id ? users[1] : users[0];
     };
 
+    // Derives an online active presence indicator boolean for the counterpart entity handling real-time synchronization lookup.
+    // Silently ignores group chats where aggregated presence indicators scale poorly contextually.
     const isUserOnline = (chat: any) => {
         if (chat.isGroupChat) return false;
         const recipient = getSenderFull(chat.users);
@@ -45,6 +53,8 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
         return onlineUsers[recipient._id]?.isOnline || recipient.isOnline;
     };
 
+    // Communicates pinned status changes to the backend mapping array.
+    // Issues a direct un-propagated API hit without altering immediate state, forcing a hard refresh via 'fetchChats()'.
     const togglePin = async (chatId: string, e: React.MouseEvent) => {
         e.stopPropagation();
         try {
@@ -145,7 +155,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                                                 {chat.latestMessage ? (
                                                     <p className={`text-xs truncate max-w-[80%] ${selectedChat?._id === chat._id ? 'text-zinc-200' : 'text-zinc-400'}`}>
                                                         <span className="font-medium opacity-80">{chat.latestMessage.sender?.name?.split(' ')[0]}: </span>
-                                                        {chat.latestMessage.image ? "📷 Image" : chat.latestMessage.fileUrl ? "📄 Document" : chat.latestMessage.audioUrl ? "🎤 Voice Note" : chat.latestMessage.content}
+                                                        {chat.latestMessage.image ? "[Image]" : chat.latestMessage.fileUrl ? "[Document]" : chat.latestMessage.audioUrl ? "[Voice Note]" : chat.latestMessage.content}
                                                     </p>
                                                 ) : (
                                                     <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest opacity-60">No messages yet</p>

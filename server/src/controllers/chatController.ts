@@ -4,9 +4,9 @@ import User from "../models/userModel";
 import Message from "../models/messageModel";
 import { Request, Response } from "express";
 
-//@description     Create or fetch One to One Chat
-//@route           POST /api/chat/
-//@access          Protected
+// Fetches a one-to-one chat between the logged-in user and a specified user ID.
+// If the chat doesn't exist yet, it provisions and creates a new one-to-one room dynamically.
+// Populates all required user fields (like 'isOnline') for client-side state management.
 const accessChat = asyncHandler(async (req: any, res: Response) => {
     const { userId } = req.body;
 
@@ -55,9 +55,9 @@ const accessChat = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-//@description     Fetch all chats for a user
-//@route           GET /api/chat/
-//@access          Protected
+// Looks up every chat room (One-to-One and Group) that the requester is a participant of.
+// Aggregates unread message counts for each chat using a specialized MongoDB aggregation pipeline.
+// Injects the unread counts into the chat object so the client can display notification badges accurately.
 const fetchChats = asyncHandler(async (req: any, res: Response) => {
     try {
         const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
@@ -108,9 +108,9 @@ const fetchChats = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-//@description     Toggle Pin Chat
-//@route           PUT /api/chat/pin
-//@access          Protected
+// Modifies the 'pinnedBy' array of a specific chat document.
+// If the logged-in user already has the chat pinned, their ID is pulled from the array.
+// If not pinned, their ID is pushed, allowing users to independently pin/unpin shared chats.
 const togglePin = asyncHandler(async (req: any, res: Response) => {
     const { chatId } = req.body;
     const chat = await Chat.findById(chatId);
@@ -132,9 +132,9 @@ const togglePin = asyncHandler(async (req: any, res: Response) => {
     res.status(200).json(updatedChat);
 });
 
-//@description     Create New Group Chat
-//@route           POST /api/chat/group
-//@access          Protected
+// Creates a new group chat context containing the requesting user and a provided array of members.
+// Validates that there are at least two additional members before creating the chat object.
+// The requester is automatically appended to the users list and designated as the group admin.
 const createGroupChat = asyncHandler(async (req: any, res: Response) => {
     if (!req.body.users || !req.body.name) {
         res.status(400).send({ message: "Please Fill all the feilds" });
@@ -171,9 +171,8 @@ const createGroupChat = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-//@description     Rename Group
-//@route           PUT /api/chat/rename
-//@access          Protected
+// Renames an existing group chat by updating the 'chatName' property in MongoDB.
+// Returns the updated Chat object enriched with user profiles so the UI correctly displays the new state.
 const renameGroup = asyncHandler(async (req: Request, res: Response) => {
     const { chatId, chatName } = req.body;
 
@@ -197,9 +196,9 @@ const renameGroup = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-//@description     Remove user from Group
-//@route           PUT /api/chat/groupremove
-//@access          Protected
+// Removes a user from a group's participant array.
+// Used both when an admin kicks someone out or when a member leaves the group voluntarily.
+// Also generates an automated system message in the chat signaling the departure/removal.
 const removeFromGroup = asyncHandler(async (req: any, res: Response) => {
     const { chatId, userId } = req.body;
 
@@ -251,9 +250,8 @@ const removeFromGroup = asyncHandler(async (req: any, res: Response) => {
     }
 });
 
-//@description     Add user to Group / Leave
-//@route           PUT /api/chat/groupadd
-//@access          Protected
+// Checks membership status and pushes a newly added user into the group's 'users' array.
+// Automatically fires a system-generated tracking message into the chat announcing the arrival of the new user.
 const addToGroup = asyncHandler(async (req: any, res: Response) => {
     const { chatId, userId } = req.body;
 
