@@ -60,53 +60,46 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
 
         try {
             setUploading(true);
+
             const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
-            if (croppedFile) {
-                const newPicUrl = await uploadToCloudinary(croppedFile);
-                if (newPicUrl) {
-                    setPic(newPicUrl);
+            if (!croppedFile) return;
 
-                    // Immediately save to backend so they don't have to click save again
-                    const config = {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${loggedInUser.token}`,
-                        },
-                    };
-                    const { data } = await api.put("/api/user/profile", { name, password, pic: newPicUrl }, config);
+            const formData = new FormData();
+            formData.append("file", croppedFile);
+            formData.append("upload_preset", "chat-app");
+            formData.append("cloud_name", "dtga8lwj3");
 
-                    const updatedUser = { ...data, token: loggedInUser.token };
-                    localStorage.setItem("userInfo", JSON.stringify(updatedUser));
-                    setUser(updatedUser);
-
-                    setImageSrc(null); // close cropper
-                }
-            }
-        } catch (e) {
-            console.error("Cropping failed:", e);
-        } finally {
-            setUploading(false);
-        }
-    };
-
-    const uploadToCloudinary = async (file: File) => {
-        const data = new FormData();
-        data.append("file", file);
-        data.append("upload_preset", "chat-app");
-        data.append("cloud_name", "dencovhau");
-
-        try {
-            const res = await fetch("https://api.cloudinary.com/v1_1/dencovhau/image/upload", {
+            const res = await fetch("https://api.cloudinary.com/v1_1/dtga8lwj3/image/upload", {
                 method: "POST",
-                body: data,
+                body: formData,
             });
 
-            if (!res.ok) throw new Error("Image upload failed");
             const imgData = await res.json();
-            return imgData.secure_url || imgData.url;
-        } catch (error: any) {
-            console.error("Profile image upload error:", error);
-            return null;
+            if (imgData.error) {
+                console.error("Cloudinary error:", imgData.error);
+                return;
+            }
+
+            const newPicUrl = imgData.secure_url || imgData.url;
+            if (!newPicUrl) return;
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${loggedInUser.token}`,
+                },
+            };
+            const { data } = await api.put("/api/user/profile", { name, pic: newPicUrl }, config);
+
+            const updatedUser = { ...data, token: loggedInUser.token };
+            localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            setPic(newPicUrl);
+            setImageSrc(null);
+        } catch (e: any) {
+            console.error("Profile photo update failed:", e);
+        } finally {
+            setUploading(false);
         }
     };
 

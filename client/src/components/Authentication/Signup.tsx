@@ -23,10 +23,10 @@ const Signup = () => {
             const data = new FormData();
             data.append("file", pics);
             data.append("upload_preset", "chat-app");
-            data.append("cloud_name", "dencovhau");
+            data.append("cloud_name", "dtga8lwj3");
 
             try {
-                const res = await fetch("https://api.cloudinary.com/v1_1/dencovhau/image/upload", {
+                const res = await fetch("https://api.cloudinary.com/v1_1/dtga8lwj3/image/upload", {
                     method: "POST",
                     body: data,
                 });

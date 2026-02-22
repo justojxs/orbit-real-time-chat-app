@@ -125,9 +125,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                 const data = new FormData();
                 data.append("file", audioBlob);
                 data.append("upload_preset", "chat-app");
-                data.append("cloud_name", "dencovhau");
+                data.append("cloud_name", "dtga8lwj3");
 
-                const res = await fetch(`https://api.cloudinary.com/v1_1/dencovhau/video/upload`, {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/dtga8lwj3/video/upload`, {
                     method: "POST",
                     body: data,
                 });
@@ -214,10 +214,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         const data = new FormData();
         data.append("file", file);
         data.append("upload_preset", "chat-app");
-        data.append("cloud_name", "dencovhau");
+        data.append("cloud_name", "dtga8lwj3");
 
         try {
-            const res = await fetch(`https://api.cloudinary.com/v1_1/dencovhau/${isImage ? 'image' : 'raw'}/upload`, {
+            const res = await fetch(`https://api.cloudinary.com/v1_1/dtga8lwj3/${isImage ? 'image' : 'raw'}/upload`, {
                 method: "POST",
                 body: data,
             });
