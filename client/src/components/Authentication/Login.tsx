@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, Loader2, Sparkles } from "lucide-react";
+import { Mail, Lock, Loader2, User as UserIcon } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -126,7 +126,7 @@ const Login = () => {
                         }
                     }}
                 >
-                    <Sparkles className="text-zinc-700 group-hover:text-emerald-500 transition-colors" size={14} />
+                    <UserIcon className="text-zinc-700 group-hover:text-emerald-500 transition-colors" size={14} />
                     Start As Guest User
                 </button>
 
