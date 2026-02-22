@@ -56,48 +56,68 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
     };
 
     const handleCropImage = async () => {
-        if (!imageSrc || !croppedAreaPixels || !loggedInUser) return;
+        if (!imageSrc || !croppedAreaPixels || !loggedInUser) {
+            alert("Missing: imageSrc=" + !!imageSrc + " crop=" + !!croppedAreaPixels + " user=" + !!loggedInUser);
+            return;
+        }
 
         try {
             setUploading(true);
 
-            const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
-            if (!croppedFile) return;
-
-            const formData = new FormData();
-            formData.append("file", croppedFile);
-            formData.append("upload_preset", "chat-app");
-            formData.append("cloud_name", "dtga8lwj3");
-
-            const res = await fetch("https://api.cloudinary.com/v1_1/dtga8lwj3/image/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            const imgData = await res.json();
-            if (imgData.error) {
-                console.error("Cloudinary error:", imgData.error);
+            // Step 1: Crop
+            let croppedFile: File | null = null;
+            try {
+                croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
+            } catch (err: any) {
+                alert("STEP 1 CROP FAILED: " + err.message);
                 return;
             }
+            if (!croppedFile) { alert("STEP 1: croppedFile is null"); return; }
+
+            // Step 2: Upload to Cloudinary
+            let imgData: any;
+            try {
+                const formData = new FormData();
+                formData.append("file", croppedFile);
+                formData.append("upload_preset", "chat-app");
+                formData.append("cloud_name", "dtga8lwj3");
+
+                const res = await fetch("https://api.cloudinary.com/v1_1/dtga8lwj3/image/upload", {
+                    method: "POST",
+                    body: formData,
+                });
+                imgData = await res.json();
+            } catch (err: any) {
+                alert("STEP 2 UPLOAD FAILED: " + err.message);
+                return;
+            }
+            if (imgData.error) { alert("STEP 2 CLOUDINARY ERROR: " + JSON.stringify(imgData.error)); return; }
 
             const newPicUrl = imgData.secure_url || imgData.url;
-            if (!newPicUrl) return;
+            if (!newPicUrl) { alert("STEP 2: No URL in response"); return; }
 
-            const config = {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${loggedInUser.token}`,
-                },
-            };
-            const { data } = await api.put("/api/user/profile", { name, pic: newPicUrl }, config);
+            // Step 3: Save to backend
+            try {
+                const config = {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${loggedInUser.token}`,
+                    },
+                };
+                const { data } = await api.put("/api/user/profile", { name, pic: newPicUrl }, config);
 
-            const updatedUser = { ...data, token: loggedInUser.token };
-            localStorage.setItem("userInfo", JSON.stringify(updatedUser));
-            setUser(updatedUser);
-            setPic(newPicUrl);
-            setImageSrc(null);
+                const updatedUser = { ...data, token: loggedInUser.token };
+                localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+                setUser(updatedUser);
+                setPic(newPicUrl);
+                setImageSrc(null);
+                alert("SUCCESS! Photo saved: " + newPicUrl.substring(0, 60) + "...");
+            } catch (err: any) {
+                alert("STEP 3 BACKEND FAILED: " + (err?.response?.data?.message || err.message));
+                return;
+            }
         } catch (e: any) {
-            console.error("Profile photo update failed:", e);
+            alert("UNEXPECTED: " + e.message);
         } finally {
             setUploading(false);
         }

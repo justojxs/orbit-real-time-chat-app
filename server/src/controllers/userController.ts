@@ -154,6 +154,11 @@ const refreshAccessToken = asyncHandler(async (req: Request, res: Response) => {
 // @route           PUT /api/user/profile
 // @access          Private
 const updateUserProfile = asyncHandler(async (req: any, res: Response) => {
+    if (!req.user || !req.user._id) {
+        res.status(401).json({ message: "Not authorized" });
+        return;
+    }
+
     const user = await User.findById(req.user._id);
 
     if (user) {
@@ -175,8 +180,7 @@ const updateUserProfile = asyncHandler(async (req: any, res: Response) => {
             token: generateToken(updatedUser._id.toString()),
         });
     } else {
-        res.status(404);
-        throw new Error("User not found");
+        res.status(404).json({ message: "User not found" });
     }
 });
 
