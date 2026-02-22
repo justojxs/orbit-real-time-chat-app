@@ -57,7 +57,6 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
 
     const handleCropImage = async () => {
         if (!imageSrc || !croppedAreaPixels || !loggedInUser) {
-            alert("Missing: imageSrc=" + !!imageSrc + " crop=" + !!croppedAreaPixels + " user=" + !!loggedInUser);
             return;
         }
 
@@ -69,10 +68,10 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
             try {
                 croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels);
             } catch (err: any) {
-                alert("STEP 1 CROP FAILED: " + err.message);
+                console.error("STEP 1 CROP FAILED: ", err);
                 return;
             }
-            if (!croppedFile) { alert("STEP 1: croppedFile is null"); return; }
+            if (!croppedFile) return;
 
             // Step 2: Upload to Cloudinary
             let imgData: any;
@@ -88,13 +87,16 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                 });
                 imgData = await res.json();
             } catch (err: any) {
-                alert("STEP 2 UPLOAD FAILED: " + err.message);
+                console.error("STEP 2 UPLOAD FAILED: ", err);
                 return;
             }
-            if (imgData.error) { alert("STEP 2 CLOUDINARY ERROR: " + JSON.stringify(imgData.error)); return; }
+            if (imgData.error) {
+                console.error("STEP 2 CLOUDINARY ERROR: ", imgData.error);
+                return;
+            }
 
             const newPicUrl = imgData.secure_url || imgData.url;
-            if (!newPicUrl) { alert("STEP 2: No URL in response"); return; }
+            if (!newPicUrl) return;
 
             // Step 3: Save to backend
             try {
@@ -111,13 +113,12 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                 setUser(updatedUser);
                 setPic(newPicUrl);
                 setImageSrc(null);
-                alert("SUCCESS! Photo saved: " + newPicUrl.substring(0, 60) + "...");
             } catch (err: any) {
-                alert("STEP 3 BACKEND FAILED: " + (err?.response?.data?.message || err.message));
+                console.error("STEP 3 BACKEND FAILED: ", err);
                 return;
             }
         } catch (e: any) {
-            alert("UNEXPECTED: " + e.message);
+            console.error("UNEXPECTED: ", e);
         } finally {
             setUploading(false);
         }
