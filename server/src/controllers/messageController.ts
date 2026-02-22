@@ -176,22 +176,26 @@ const searchMessages = asyncHandler(async (req: Request, res: Response) => {
 const summarizeChat = asyncHandler(async (req: any, res: Response) => {
     try {
         const { chatId } = req.params;
+        const { transcript: providedTranscript } = req.body;
 
-        // Fetch last 50 messages
-        const messages = await Message.find({ chat: chatId, isDeleted: false })
-            .sort({ createdAt: -1 })
-            .limit(50)
-            .populate("sender", "name");
+        let transcript = providedTranscript;
 
-        if (!messages || messages.length === 0) {
-            res.json({ summary: "No messages to summarize yet." });
-            return;
+        if (!transcript) {
+            // Fetch last 50 messages implicitly if no transcript sent
+            const messages = await Message.find({ chat: chatId, isDeleted: false })
+                .sort({ createdAt: -1 })
+                .limit(50)
+                .populate("sender", "name");
+
+            if (!messages || messages.length === 0) {
+                res.json({ summary: "No messages to summarize yet." });
+                return;
+            }
+
+            // Reverse to chronological order
+            messages.reverse();
+            transcript = messages.map((m: any) => `${m.sender.name}: ${m.content || '[attachment/image]'}`).join('\n');
         }
-
-        // Reverse to chronological order
-        messages.reverse();
-
-        const transcript = messages.map((m: any) => `${m.sender.name}: ${m.content || '[attachment/image]'}`).join('\n');
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {

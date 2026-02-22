@@ -4,7 +4,7 @@ import { CheckCheck, Trash2, Smile, Download, FileText, Mic } from "lucide-react
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../lib/axios";
 
-const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMessages }: { messages: any[], socket: any, activeMessageId?: string, searchQuery?: string, setMessages?: any }) => {
+const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMessages, firstUnreadId }: { messages: any[], socket: any, activeMessageId?: string, searchQuery?: string, setMessages?: any, firstUnreadId?: string | null }) => {
     const { user, selectedChat } = useChatStore();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -110,6 +110,19 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                         </span>
                                     </motion.div>
                                 )}
+
+                                {firstUnreadId === m._id && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="flex items-center w-full my-6 bg-[#0c0c0e]"
+                                    >
+                                        <div className="flex-1 border-t border-emerald-500/30 border-dashed"></div>
+                                        <span className="px-4 text-[10px] font-bold uppercase tracking-widest text-emerald-400">Unread Messages</span>
+                                        <div className="flex-1 border-t border-emerald-500/30 border-dashed"></div>
+                                    </motion.div>
+                                )}
+
                                 {m.isSystemMessage || m.content?.includes("has left the group") || m.content?.includes("was removed from") || m.content?.includes("was added to") ? (
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.95 }}

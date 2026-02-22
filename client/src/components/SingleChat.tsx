@@ -22,10 +22,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isGroupOpen, setIsGroupOpen] = useState(false);
     const [isWhiteboardOpen, setIsWhiteboardOpen] = useState(false);
+    const [firstUnreadId, setFirstUnreadId] = useState<string | null>(null);
 
     // AI Summary States
     const [isSummarizing, setIsSummarizing] = useState(false);
     const [chatSummary, setChatSummary] = useState<string | null>(null);
+    const [isCatchMeUpOpen, setIsCatchMeUpOpen] = useState(false);
 
     // Search States
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -58,6 +60,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                 config
             );
             setMessages(data);
+
+            const unreadIndex = data.findIndex((m: any) => m.sender._id !== user._id && !(m.readBy?.includes(user._id)));
+            if (unreadIndex !== -1) {
+                setFirstUnreadId(data[unreadIndex]._id);
+            } else {
+                setFirstUnreadId(null);
+            }
+
             setLoading(false);
             socket.emit("join chat", selectedChat._id);
             socket.emit("read message", { chatId: selectedChat._id, userId: user._id });
@@ -67,16 +77,44 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
         }
     };
 
-    const handleCatchMeUp = async () => {
+    const handleCatchMeUp = async (type: "unread" | "today") => {
         if (!selectedChat) return;
+        setIsCatchMeUpOpen(false);
         setIsSummarizing(true);
         try {
+            let messagesToSummarize = [...messages];
+
+            if (type === "unread") {
+                if (!firstUnreadId) {
+                    setChatSummary("You have no unread messages to summarize.");
+                    setIsSummarizing(false);
+                    return;
+                }
+                const startIndex = messages.findIndex(m => m._id === firstUnreadId);
+                if (startIndex !== -1) {
+                    messagesToSummarize = messages.slice(startIndex);
+                }
+            } else if (type === "today") {
+                const today = new Date().toLocaleDateString();
+                messagesToSummarize = messages.filter(m => {
+                    const msgDate = new Date(m.createdAt || Date.now()).toLocaleDateString();
+                    return msgDate === today;
+                });
+                if (messagesToSummarize.length === 0) {
+                    setChatSummary("No messages sent today to summarize.");
+                    setIsSummarizing(false);
+                    return;
+                }
+            }
+
+            const transcript = messagesToSummarize.map((m: any) => `${m.sender?.name || 'Unknown'}: ${m.content || '[attachment/image]'}`).join('\n');
+
             const config = {
                 headers: {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await api.get(`/api/message/summary/${selectedChat._id}`, config);
+            const { data } = await api.post(`/api/message/summary/${selectedChat._id}`, { transcript }, config);
             setChatSummary(data.summary);
         } catch (error) {
             console.error("Summary error:", error);
@@ -542,15 +580,49 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                                 <PenTool size={16} className="group-hover:-rotate-12 transition-transform" />
                                 <span className="text-[10px] font-bold uppercase tracking-widest hidden lg:inline">Live Whiteboard</span>
                             </button>
-                            <button
-                                onClick={handleCatchMeUp}
-                                disabled={isSummarizing || messages.length === 0}
-                                title="Catch Me Up (AI Summary)"
-                                className="px-3 py-1.5 text-emerald-300 hover:text-white transition-all bg-gradient-to-r from-emerald-500/20 to-teal-400/20 hover:from-emerald-500/30 hover:to-teal-400/30 rounded-xl border border-emerald-500/30 hover:border-emerald-400/60 hidden sm:flex items-center gap-2 group disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                            >
-                                {isSummarizing ? <Loader2 size={16} className="animate-spin text-emerald-200" /> : <Wand2 size={16} className="group-hover:rotate-12 transition-transform text-emerald-200" />}
-                                <span className="text-[10px] font-black uppercase tracking-widest hidden lg:inline text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-teal-200">Catch Me Up</span>
-                            </button>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsCatchMeUpOpen(!isCatchMeUpOpen)}
+                                    disabled={isSummarizing || messages.length === 0}
+                                    title="Catch Me Up (AI Summary)"
+                                    className="px-3 py-1.5 text-emerald-300 hover:text-white transition-all bg-gradient-to-r from-emerald-500/20 to-teal-400/20 hover:from-emerald-500/30 hover:to-teal-400/30 rounded-xl border border-emerald-500/30 hover:border-emerald-400/60 hidden sm:flex items-center gap-2 group disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                                >
+                                    {isSummarizing ? <Loader2 size={16} className="animate-spin text-emerald-200" /> : <Wand2 size={16} className="group-hover:rotate-12 transition-transform text-emerald-200" />}
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden lg:inline text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-teal-200">Catch Me Up</span>
+                                    <ChevronDown size={14} className="text-emerald-300 opacity-60 ml-1 group-hover:opacity-100" />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isCatchMeUpOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-40" onClick={() => setIsCatchMeUpOpen(false)}></div>
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-emerald-500/30 rounded-2xl shadow-2xl z-50 overflow-hidden"
+                                            >
+                                                <div className="p-1 space-y-1 bg-gradient-to-br from-emerald-500/5 to-transparent">
+                                                    <button
+                                                        onClick={() => handleCatchMeUp("unread")}
+                                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-zinc-300 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all text-left"
+                                                    >
+                                                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_10px_rgba(16,185,129,0.6)]"></span>
+                                                        Summarize Unread
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleCatchMeUp("today")}
+                                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-zinc-300 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all text-left"
+                                                    >
+                                                        <span className="w-2 h-2 rounded-full border border-emerald-500 shrink-0"></span>
+                                                        Summarize Today
+                                                    </button>
+                                                </div>
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                             <AnimatePresence>
                                 {isSearchOpen && (
                                     <motion.div
@@ -621,9 +693,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
                             <ScrollableChat
                                 messages={messages}
                                 socket={socket}
-                                activeMessageId={searchResults?.[activeSearchIndex]?._id}
+                                activeMessageId={searchResults && activeSearchIndex >= 0 ? searchResults[activeSearchIndex]._id : undefined}
                                 searchQuery={searchResults ? searchQuery : ""}
                                 setMessages={setMessages}
+                                firstUnreadId={firstUnreadId}
                             />
                         )}
                         {searchResults && (
