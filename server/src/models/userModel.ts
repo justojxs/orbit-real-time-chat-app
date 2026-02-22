@@ -32,9 +32,9 @@ userSchema.methods.matchPassword = async function (enteredPassword: string) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.pre("save", async function (this: any, next: any) {
+userSchema.pre("save", async function (this: any) {
     if (!this.isModified("password")) {
-        return next();
+        return;
     }
 
     const salt = await bcrypt.genSalt(10);
