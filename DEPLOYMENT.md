@@ -1,4 +1,4 @@
-# 🚀 Orbit Chat — Deployment Guide
+# Orbit Chat — Deployment Guide
 
 This guide walks you through deploying the Orbit Chat application with:
 - **Frontend (React/Vite)** → Vercel
@@ -71,8 +71,8 @@ Scroll down to **"Environment Variables"** section and add these one by one:
 | `CLIENT_URL` | `https://your-vercel-url.vercel.app` ← **Leave this blank for now, we'll update it in Phase 4** |
 | `NODE_ENV` | `production` |
 
-> ⚠️ **Important**: Do NOT add `PORT`. Render automatically sets `PORT` for you.
-> ⚠️ **Important**: Do NOT add `REDIS_URL`. The server works fine without it.
+> **Important**: Do NOT add `PORT`. Render automatically sets `PORT` for you.
+> **Important**: Do NOT add `REDIS_URL`. The server works fine without it.
 
 ### Step 2.4 — Deploy
 1. Click **"Create Web Service"**
@@ -81,7 +81,7 @@ Scroll down to **"Environment Variables"** section and add these one by one:
    - Run `npm install --include=dev && npm run build` in the `server/` folder
    - Run `npm start` (which runs `node dist/index.js`)
 3. **Wait 3-5 minutes** for the build to finish
-4. You'll see green text saying **"Your service is live 🎉"**
+4. You'll see green text saying **"Your service is live"**
 5. **Copy your Render URL** — it will look like:
    ```
    https://orbit-chat-backend.onrender.com
@@ -93,7 +93,7 @@ Open your Render URL in a browser. You should see:
 ```
 API is running...
 ```
-If you see this, your backend is deployed successfully! ✅
+If you see this, your backend is deployed successfully!
 
 > **Note**: On Render's free tier, the server goes to sleep after 15 minutes of inactivity.
 > The first request after sleeping takes ~30-60 seconds to wake up. This is normal.
@@ -125,9 +125,9 @@ Expand **"Environment Variables"** and add:
 |---|---|
 | `VITE_API_URL` | `https://orbit-chat-backend.onrender.com` ← **Paste your Render URL from Step 2.4** |
 
-> ⚠️ **Important**: Make sure there is NO trailing slash `/` at the end of the URL.
-> ✅ Correct: `https://orbit-chat-backend.onrender.com`
-> ❌ Wrong: `https://orbit-chat-backend.onrender.com/`
+> **Important**: Make sure there is NO trailing slash `/` at the end of the URL.
+> Correct: `https://orbit-chat-backend.onrender.com`
+> Wrong: `https://orbit-chat-backend.onrender.com/`
 
 ### Step 3.4 — Deploy
 1. Click **"Deploy"**
@@ -165,7 +165,7 @@ Right now, your backend doesn't know the frontend's URL, so CORS will block requ
 1. Open your Vercel URL in a browser: `https://orbit-chat.vercel.app`
 2. You should see the Orbit landing page
 3. Try logging in or signing up
-4. If it works, congratulations! 🎉
+4. If it works, congratulations!
 
 ---
 
