@@ -1,54 +1,38 @@
-# Orbit Chat App
+# Orbit: Scalable Real-Time Messaging Platform
 
-Orbit is an ultra-premium, real-time messaging platform built for scale and aesthetic excellence. It features a complete high-fidelity UI, distributed backend architecture, and advanced collaboration features.
+Orbit is a distributed, real-time messaging engine architected to support high-concurrency environments. It leverages Redis Pub/Sub and Socket.io to ensure robust message delivery across horizontally scaled node instances with sub-50ms latency.
 
-![Design Preview](https://via.placeholder.com/800x400?text=Orbit+Chat+Aesthetic)
+## Architecture & Features
+- **Real-Time Synchronization**: Maintains consistent multi-tab user "Online/Offline" presence through a stateful socket session counter, eliminating race conditions.
+- **NLP Aggregation**: Integrates the Google Gemini 2.5 API for dynamic, context-aware summarization of highly active chat streams and unread threads.
+- **Collaborative Whiteboard**: Provides a 100Hz bidirectional synchronized canvas for real-time remote collaboration.
+- **Optimized UI**: Built with React, utilizing custom Framer Motion variants for performant, hardware-accelerated animations alongside a responsive CSS grid layout.
+- **Media & Payload Handling**: Supports multipart-form data uploads for images, documents, and Opus-encoded voice notes via Cloudinary integration.
+- **Data Integrity**: Implements soft-deletion of messages and asynchronous localized optimistic UI updates for emoji reactions to maintain consistency without blocking the main thread.
 
-## ✨ Core Features
-- **Modern UI**: Dark-mode first design with glassmorphism and smooth Framer Motion animations.
-- **Real-Time Stream**: Low-latency communication powered by Socket.io and Redis.
-- **Presence Tracking**: Live online/offline status indicators and "Last Seen" timestamps.
-- **Rich Media**: Share images and documents (PDF, Docs, Zips) via Cloudinary.
-- **Message Actions**: Soft-delete functionality and emoji reactions.
-- **Group Hubs**: Collaborative group spaces with admin controls.
+## Tech Stack
+- **Client**: React (Vite), TypeScript, TailwindCSS, Framer Motion
+- **Server**: Node.js, Express, Socket.io
+- **Data Layer**: MongoDB (Atlas)
+- **Infrastructure & Testing**: Redis, Docker, Playwright (E2E), GitHub Actions (CI/CD)
 
-## 🚀 Deployment
+## Local Development
 
-### Ready for Vercel
-The project is configured for Vercel out of the box. 
-1. Push this repository to GitHub.
-2. Link the repository to your Vercel project.
-3. Configure the environment variables in Vercel settings.
-
-> **Note**: For WebSockets to function in production, it is recommended to host the backend on a platform that supports persistent connections (like Railway, Render, or DigitalOcean) or use a specialized WebSocket provider.
-
-## 🛠 Tech Stack
-- **Frontend**: React (Vite), TailwindCSS, Framer Motion, Lucide Icons
-- **Backend**: Node.js, Express, Socket.io
-- **Database**: MongoDB (Atlas)
-- **Infrastructure**: Redis, Docker, Nginx (for distributed setup)
-
-## 🏗 Setup & Installation
-
-### Local Development
-1. Clone the repository
-2. Install dependencies:
+1. Clone the repository and install dependencies sequentially:
    ```bash
-   npm install
-   cd client && npm install
-   cd ../server && npm install
+   npm install && cd client && npm install && cd ../server && npm install
    ```
-3. Set up `.env` files using the provided `.env.example` templates.
-4. Start the development server:
+2. Provision local environment variables by copying `.env.example` to `.env` in both client and server directories.
+3. Boot the development servers concurrently:
    ```bash
    npm run dev
    ```
 
-### Distributed Mode (Docker)
-Run the entire production-grade cluster locally:
+### Docker Swarm / Distributed Testing
+To spin up a production-analogous cluster locally for stress testing:
 ```bash
 docker-compose up --build
 ```
 
---
-Built by Ojas Gupta DTU 23/CS/290
+---
+Built by Ojas Gupta (DTU CSE 23/CS/290)
