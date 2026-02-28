@@ -23,9 +23,9 @@ const HomePage = () => {
                 <ThemeToggle />
             </div>
 
-            {/* Background image */}
+            {/* Background image - Light Mode */}
             <div
-                className="fixed inset-0 z-0 pointer-events-none"
+                className="fixed inset-0 z-0 pointer-events-none dark:hidden"
                 style={{
                     backgroundImage: 'url(/bg-mesh.png)',
                     backgroundSize: 'cover',
@@ -33,6 +33,13 @@ const HomePage = () => {
                     opacity: 0.7,
                 }}
             />
+
+            {/* Background gradients - Dark Mode */}
+            <div className="fixed inset-0 z-0 pointer-events-none hidden dark:block">
+                <div className="absolute top-0 left-[-20%] w-[70%] h-[70%] bg-emerald-500/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-teal-500/10 rounded-full blur-[100px]" />
+                <div className="absolute top-[20%] right-[20%] w-[30%] h-[30%] bg-indigo-500/5 rounded-full blur-[80px]" />
+            </div>
 
             {/* Left panel — Brand */}
             <div className="hidden lg:flex flex-col justify-between w-[55%] p-12 xl:p-16 relative z-10">

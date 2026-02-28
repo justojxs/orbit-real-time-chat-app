@@ -104,7 +104,7 @@ const MyChats = () => {
                     )}
                 </div>
                 <GroupChatModal>
-                    <button className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-3.5 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95">
+                    <button className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3.5 py-2 rounded-xl border border-emerald-200 dark:border-emerald-500/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95">
                         <Plus size={14} strokeWidth={2.5} /> Group
                     </button>
                 </GroupChatModal>
@@ -130,8 +130,8 @@ const MyChats = () => {
                                     onClick={() => setSelectedChat(chat)}
                                     key={chat._id}
                                     className={`cursor-pointer px-3 py-3 rounded-xl transition-all border group relative ${isActive
-                                        ? "bg-emerald-50 border-emerald-200/60"
-                                        : "bg-transparent border-transparent hover:bg-gray-50 dark:bg-[#0e0e13] dark:hover:bg-white/5"
+                                        ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200/60 dark:border-emerald-500/20"
+                                        : "bg-transparent border-transparent hover:bg-gray-50 dark:hover:bg-white/5"
                                         } active:scale-[0.99]`}
                                 >
                                     {isActive && (
@@ -147,12 +147,12 @@ const MyChats = () => {
                                                     alt="avatar"
                                                 />
                                             ) : (
-                                                <div className="w-11 h-11 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-base border border-emerald-200">
+                                                <div className="w-11 h-11 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold text-base border border-emerald-200 dark:border-emerald-500/20">
                                                     {chat.chatName[0]?.toUpperCase()}
                                                 </div>
                                             )}
                                             {isUserOnline(chat) && (
-                                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
+                                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#0a0a0f]"></div>
                                             )}
                                         </div>
 

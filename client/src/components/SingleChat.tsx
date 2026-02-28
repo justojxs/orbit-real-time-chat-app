@@ -588,7 +588,7 @@ const SingleChat = () => {
                                 onClick={() => setIsWhiteboardOpen(true)}
                                 disabled={uploadingFile}
                                 title="Live Collaborative Whiteboard"
-                                className="px-3 py-1.5 text-blue-600 hover:text-blue-700 transition-all bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 hover:border-blue-300 hidden sm:flex items-center gap-2 group disabled:opacity-50"
+                                className="px-3 py-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-all bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-xl border border-blue-200 dark:border-blue-500/20 hover:border-blue-300 dark:hover:border-blue-500/30 hidden sm:flex items-center gap-2 group disabled:opacity-50"
                             >
                                 <PenTool size={16} className="group-hover:-rotate-12 transition-transform" />
                                 <span className="text-[10px] font-bold uppercase tracking-widest hidden lg:inline">Live Whiteboard</span>
@@ -598,10 +598,10 @@ const SingleChat = () => {
                                     onClick={() => setIsCatchMeUpOpen(!isCatchMeUpOpen)}
                                     disabled={isSummarizing || messages.length === 0}
                                     title="Catch Me Up (AI Summary)"
-                                    className="px-3 py-1.5 text-emerald-600 hover:text-emerald-700 transition-all bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 hover:border-emerald-300 hidden sm:flex items-center gap-2 group disabled:opacity-50"
+                                    className="px-3 py-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-all bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 rounded-xl border border-emerald-200 dark:border-emerald-500/20 hover:border-emerald-300 dark:hover:border-emerald-500/30 flex items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isSummarizing ? <Loader2 size={16} className="animate-spin text-emerald-500" /> : <Wand2 size={16} className="group-hover:rotate-12 transition-transform text-emerald-500" />}
-                                    <span className="text-[10px] font-black uppercase tracking-widest hidden lg:inline text-emerald-600">Catch Me Up</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden lg:inline text-emerald-600 dark:text-emerald-400">Catch Me Up</span>
                                     <ChevronDown size={14} className="text-emerald-500 opacity-60 ml-1 group-hover:opacity-100" />
                                 </button>
 
@@ -657,7 +657,7 @@ const SingleChat = () => {
                             </AnimatePresence>
                             <button
                                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                                className={`p-2.5 transition-colors rounded-xl border border-transparent ${isSearchOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 hover:bg-gray-50 dark:bg-[#0e0e13] dark:hover:bg-white/5 hover:border-gray-200 dark:border-white/5 dark:hover:border-white/10'}`}
+                                className={`p-2.5 transition-colors rounded-xl border border-transparent ${isSearchOpen ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 hover:bg-gray-50 dark:bg-[#0e0e13] dark:hover:bg-white/5 hover:border-gray-200 dark:border-white/5 dark:hover:border-white/10'}`}
                             >
                                 <SearchIcon size={20} />
                             </button>
@@ -681,7 +681,7 @@ const SingleChat = () => {
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-emerald-50 rounded-xl">
+                                            <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl">
                                                 <Sparkles className="text-emerald-500" size={20} />
                                             </div>
                                             <h3 className="text-emerald-600 font-bold tracking-tight text-lg">AI Chat Summary</h3>
@@ -713,7 +713,7 @@ const SingleChat = () => {
                             />
                         )}
                         {searchResults && (
-                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-50 backdrop-blur-sm border border-emerald-200 px-6 py-2.5 rounded-full z-30 flex items-center gap-4 shadow-md">
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-50 dark:bg-[#0e0e13]/80 backdrop-blur-sm border border-emerald-200 dark:border-emerald-500/20 px-6 py-2.5 rounded-full z-30 flex items-center gap-4 shadow-md">
                                 <div className="flex items-center gap-2 border-r border-emerald-200 pr-4">
                                     <span className="text-[10px] uppercase font-black tracking-widest text-emerald-600">
                                         {searchResults.length > 0 ? `${activeSearchIndex + 1} of ${searchResults.length}` : "0 results"}
@@ -784,7 +784,7 @@ const SingleChat = () => {
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
-                                        className="absolute inset-0 bg-emerald-50 backdrop-blur-sm rounded-[2rem] z-50 flex items-center justify-between px-8 border border-emerald-300"
+                                        className="absolute inset-0 bg-emerald-50 dark:bg-[#0a0a0f]/90 backdrop-blur-sm rounded-[2rem] z-50 flex items-center justify-between px-8 border border-emerald-300 dark:border-emerald-500/30"
                                     >
                                         <div className="flex items-center gap-4">
                                             <div className="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
@@ -867,7 +867,7 @@ const SingleChat = () => {
             ) : (
                 <div className="h-full flex flex-col items-center justify-center p-8 text-center">
                     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md">
-                        <div className="w-24 h-24 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-200">
+                        <div className="w-24 h-24 bg-emerald-50 dark:bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-200 dark:border-emerald-500/20">
                             <Send size={40} className="text-emerald-500" />
                         </div>
                         <h2 className="text-4xl font-bold text-gray-900 dark:text-white tracking-tighter mb-4">Select a Conversation</h2>

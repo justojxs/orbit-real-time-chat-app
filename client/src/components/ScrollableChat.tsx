@@ -199,7 +199,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
 
                                             {!m.isDeleted && m.fileUrl && (
                                                 <div className="mb-3 -mx-2 -mt-2 bg-gray-50 dark:bg-[#0e0e13] p-4 rounded-[1.2rem] border border-gray-200 dark:border-white/5 flex items-center gap-4 group/file">
-                                                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-200">
+                                                    <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-200 dark:border-emerald-500/20">
                                                         <FileText size={24} />
                                                     </div>
                                                     <div className="flex-1 overflow-hidden">
@@ -226,7 +226,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                         <audio
                                                             controls
                                                             src={m.audioUrl}
-                                                            className="h-8 w-full brightness-90 contrast-125 saturate-150 rounded-full [&::-webkit-media-controls-enclosure]:bg-emerald-50 [&::-webkit-media-controls-panel]:bg-transparent"
+                                                            className="h-8 w-full brightness-90 contrast-125 saturate-150 rounded-full [&::-webkit-media-controls-enclosure]:bg-emerald-50 dark:[&::-webkit-media-controls-enclosure]:bg-emerald-900/30 [&::-webkit-media-controls-panel]:bg-transparent"
                                                         />
                                                     </div>
                                                 </div>

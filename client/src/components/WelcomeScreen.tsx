@@ -7,7 +7,7 @@ const ACTIONS = [
         icon: Zap,
         title: "Start a Conversation",
         desc: "Search for any user and send your first message instantly.",
-        iconBox: "bg-emerald-50 text-emerald-500 border-emerald-200",
+        iconBox: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 border-emerald-200 dark:border-emerald-500/20",
         onClick: () => window.dispatchEvent(new CustomEvent('open-search-drawer')),
     },
     {

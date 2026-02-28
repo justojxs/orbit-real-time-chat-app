@@ -7,18 +7,24 @@ const ChatPage = () => {
     const { user } = useChatStore();
 
     return (
-        <div className="w-full h-screen flex flex-col bg-[#f7f8fa] text-gray-900 dark:text-white overflow-hidden relative font-sans">
-            {/* Background image */}
+        <div className="flex w-full h-screen bg-[#f7f8fa] dark:bg-[#08080c] text-gray-900 dark:text-white font-sans selection:bg-emerald-500/20 selection:text-emerald-900 relative overflow-hidden flex-col">
+            {/* Background image - Light Mode */}
             <div
-                className="fixed inset-0 z-0 pointer-events-none"
+                className="fixed inset-0 z-0 pointer-events-none dark:hidden"
                 style={{
                     backgroundImage: 'url(/bg-mesh.png)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    opacity: 0.5,
+                    opacity: 0.7,
                 }}
             />
-            <div className="fixed inset-0 z-0 premium-bg pointer-events-none opacity-30"></div>
+
+            {/* Background gradients - Dark Mode */}
+            <div className="fixed inset-0 z-0 pointer-events-none hidden dark:block">
+                <div className="absolute top-0 left-[-20%] w-[70%] h-[70%] bg-emerald-500/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-teal-500/10 rounded-full blur-[100px]" />
+                <div className="absolute top-[20%] right-[20%] w-[30%] h-[30%] bg-indigo-500/5 rounded-full blur-[80px]" />
+            </div>
 
             <div className="relative z-10 w-full h-full flex flex-col">
                 {user && <SideDrawer />}
