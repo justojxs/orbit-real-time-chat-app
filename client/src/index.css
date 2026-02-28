@@ -51,9 +51,10 @@
       radial-gradient(circle at 15% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
       radial-gradient(circle at 85% 100%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
       linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
-    background-position: top left, bottom right, center center, center center;
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      url('/orbit-bg.png');
+    background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px, cover;
+    background-position: top left, bottom right, center center, center center, center center;
     background-attachment: fixed;
   }
 
