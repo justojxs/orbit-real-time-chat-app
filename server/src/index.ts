@@ -14,6 +14,7 @@ import rateLimit from 'express-rate-limit'; // Fixed import to standard
 import cookieParser from 'cookie-parser';
 import Message from './models/messageModel';
 import User from './models/userModel';
+import compression from 'compression';
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ if (process.env.REDIS_URL) {
 
 connectDB();
 
+app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
