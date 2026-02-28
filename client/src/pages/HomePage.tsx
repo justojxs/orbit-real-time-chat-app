@@ -60,14 +60,14 @@ const HomePage = () => {
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
                     >
                         <h1 className="text-5xl xl:text-6xl font-bold tracking-tight text-gray-900 dark:text-white leading-[1.1] mb-6">
-                            Where teams
+                            Where individuals
                             <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">communicate</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">connect</span>
                             <br />
                             without limits.
                         </h1>
                         <p className="text-lg text-gray-500 dark:text-zinc-400 font-medium leading-relaxed mb-10 max-w-md">
-                            Orbit is the messaging platform engineered for speed, privacy, and intelligence. Everything you need to collaborate — in one place.
+                            Orbit is your personal messaging platform engineered for speed, privacy, and intelligence. Everything you need to stay connected — in one place.
                         </p>
                     </motion.div>
 
@@ -113,8 +113,8 @@ const HomePage = () => {
             </div>
 
             {/* Right panel — Auth */}
-            <div className="flex-1 flex items-center justify-center p-6 sm:p-10 lg:p-12 relative z-10">
-                <div className="w-full max-w-[440px]">
+            <div className="flex-1 flex items-center justify-center p-6 sm:p-10 lg:p-12 relative z-10 w-full lg:w-auto">
+                <div className="w-full max-w-[440px] bg-white dark:bg-[#0c0c12] rounded-[2rem] p-6 sm:p-10 border border-gray-100 dark:border-white/[0.05] shadow-2xl shadow-gray-200/50 dark:shadow-black/50">
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -133,28 +133,28 @@ const HomePage = () => {
                             <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
                                 {view === "login" ? "Welcome back" : "Create your account"}
                             </h2>
-                            <p className="text-sm text-gray-500 dark:text-zinc-400 font-medium">
+                            <p className="text-sm text-gray-500 dark:text-zinc-400 font-medium mt-1.5">
                                 {view === "login"
-                                    ? "Enter your credentials to access your workspace."
-                                    : "Join thousands of teams already on Orbit."}
+                                    ? "Enter your credentials to access your account."
+                                    : "Join thousands of users already on Orbit."}
                             </p>
                         </div>
 
-                        <div className="flex mb-8 bg-gray-100 dark:bg-white/5 p-1 rounded-xl border border-gray-200/60 dark:border-white/[0.04] relative overflow-hidden">
+                        <div className="flex mb-8 bg-gray-100 dark:bg-[#13131a] p-1.5 rounded-xl border border-gray-200/60 dark:border-white/[0.08] relative overflow-hidden">
                             <motion.div
                                 animate={{ x: view === "login" ? "0%" : "100%" }}
                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-emerald-500 rounded-lg shadow-md"
+                                className="absolute inset-y-1.5 left-1.5 w-[calc(50%-6px)] bg-emerald-500 rounded-lg shadow-md"
                             />
                             <button
                                 onClick={() => setView("login")}
-                                className={`flex-1 py-2.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${view === "login" ? "text-white" : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200"}`}
+                                className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${view === "login" ? "text-white" : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200"}`}
                             >
                                 Log In
                             </button>
                             <button
                                 onClick={() => setView("signup")}
-                                className={`flex-1 py-2.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${view === "signup" ? "text-white" : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200"}`}
+                                className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${view === "signup" ? "text-white" : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200"}`}
                             >
                                 Sign Up
                             </button>

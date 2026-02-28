@@ -115,7 +115,11 @@
   }
 
   .dark .premium-card {
-    @apply bg-[#0a0a0f] border-white/[0.08] hover:shadow-[0_20px_50px_rgba(0, 0, 0, 0.5)];
+    @apply bg-[#0a0a0f] border-white/[0.08];
+  }
+
+  .dark .premium-card:hover {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   }
 
   .btn-primary {

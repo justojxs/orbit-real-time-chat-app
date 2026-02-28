@@ -13,7 +13,7 @@ const ACTIONS = [
     {
         icon: Users,
         title: "Create a Group",
-        desc: "Bring your team together in a shared space for real-time collaboration.",
+        desc: "Bring people together in a shared space for real-time collaboration.",
         iconBox: "bg-teal-500/10 text-teal-400 border-teal-500/15",
         isGroupTrigger: true,
     },
