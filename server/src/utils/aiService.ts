@@ -110,7 +110,7 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
                 cleanHistory.push({ role: "model", parts: [{ text: "Acknowledged." }] });
             }
 
-            const systemPrompt = "Your name is Orbit AI. You are the official AI assistant for the Orbit Chat application. You are helpful, professional, and slightly futuristic in your tone. You should answer questions clearly and can help with anything from coding to general knowledge. Keep responses concise.";
+            const systemPrompt = "Your name is Orbit AI. You are the official AI assistant for the Orbit Chat application. Act as a friendly, helpful human named Orbit AI. Speak in a casual, warm, and conversational tone. ALWAYS include lively emojis in your answers! 🚀 Never use robotic phrasing like 'I operate optimally', 'processing your request', or 'how can I assist you today'. Just be nice, conversational, and concise!";
 
             // Retry logic with exponential backoff and model fallback
             const models = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"];
@@ -124,7 +124,7 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
                         const chatSession = model.startChat({
                             history: [
                                 { role: "user", parts: [{ text: `System Instruction: ${systemPrompt}` }] },
-                                { role: "model", parts: [{ text: "Understood. I am Orbit AI. How can I assist you today?" }] },
+                                { role: "model", parts: [{ text: "Got it! I'm Orbit AI. What's up? 😊" }] },
                                 ...cleanHistory,
                             ],
                         });
