@@ -162,7 +162,7 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                        className="absolute inset-0 bg-black/20 backdrop-blur-md"
                         onClick={onClose}
                     />
 
@@ -170,13 +170,13 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="bg-[#121217] border border-white/[0.08] rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] w-full max-w-[380px] relative overflow-hidden flex flex-col items-center p-8 gap-6 z-10"
+                        className="bg-white dark:bg-[#0a0a0f] border border-gray-300 dark:border-white/10 rounded-[2rem] shadow-xl w-full max-w-[380px] relative overflow-hidden flex flex-col items-center p-8 gap-6 z-10"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close Button */}
                         <button
                             onClick={onClose}
-                            className="absolute top-5 right-5 text-zinc-500 hover:text-white transition-colors"
+                            className="absolute top-5 right-5 text-gray-400 dark:text-zinc-500 hover:text-gray-900 dark:text-white dark:hover:text-white transition-colors"
                         >
                             <X size={20} />
                         </button>
@@ -184,7 +184,7 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                         {/* Content Container (Cropper OR Profile) */}
                         {imageSrc ? (
                             <div className="w-full flex flex-col items-center">
-                                <h2 className="text-xl font-bold text-white tracking-tight mb-4 flex items-center gap-2">
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight mb-4 flex items-center gap-2">
                                     <CropIcon size={20} className="text-emerald-500" />
                                     Crop Picture
                                 </h2>
@@ -204,14 +204,14 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                                 <div className="flex gap-2 w-full">
                                     <button
                                         onClick={() => setImageSrc(null)}
-                                        className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-zinc-400 rounded-xl text-xs font-bold transition-all"
+                                        className="flex-1 py-3 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 text-gray-500 dark:text-zinc-400 rounded-xl text-xs font-bold transition-all"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         onClick={handleCropImage}
                                         disabled={uploading}
-                                        className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
+                                        className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-gray-900 dark:text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
                                     >
                                         {uploading ? <Loader2 className="animate-spin" size={16} /> : "Crop & Upload"}
                                     </button>
@@ -221,21 +221,21 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                             <>
                                 {/* Header */}
                                 <div className="text-center">
-                                    <h2 className="text-xl font-bold text-white tracking-tight">
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
                                         {isEditing ? "Edit Profile" : isCurrentUser ? "Your Profile" : "User Details"}
                                     </h2>
                                     <div className="flex items-center justify-center gap-1.5 mt-1">
                                         <ShieldCheck size={12} className="text-emerald-500" />
-                                        <span className="text-[9px] uppercase font-bold tracking-widest text-zinc-500">Verified User Identity</span>
+                                        <span className="text-[9px] uppercase font-bold tracking-widest text-gray-400 dark:text-zinc-500">Verified User Identity</span>
                                     </div>
                                 </div>
 
                                 {/* Avatar Section */}
                                 <div className="relative group">
                                     <div className="relative w-28 h-28">
-                                        <div className="absolute inset-0 bg-emerald-500/10 blur-2xl rounded-full"></div>
+                                        <div className="absolute inset-0 bg-emerald-50 blur-2xl rounded-full"></div>
                                         <img
-                                            className="w-full h-full rounded-full border-2 border-white/10 p-1 object-cover relative z-10"
+                                            className="w-full h-full rounded-full border-2 border-gray-200 dark:border-white/5 p-1 object-cover relative z-10"
                                             src={pic || displayUser?.pic}
                                             alt={displayUser?.name}
                                         />
@@ -246,12 +246,12 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                                                     animate={{ opacity: 1 }}
                                                     exit={{ opacity: 0 }}
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="absolute inset-0 rounded-full bg-black/60 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center cursor-pointer border border-emerald-500/30"
+                                                    className="absolute inset-0 rounded-full bg-black/20 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center cursor-pointer border border-emerald-300"
                                                 >
                                                     {uploading ? (
-                                                        <Loader2 className="text-emerald-400 animate-spin" size={20} />
+                                                        <Loader2 className="text-emerald-500 animate-spin" size={20} />
                                                     ) : (
-                                                        <Camera className="text-white" size={20} />
+                                                        <Camera className="text-gray-900 dark:text-white" size={20} />
                                                     )}
                                                 </motion.button>
                                             )}
@@ -284,19 +284,19 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                                                 className="w-full space-y-4"
                                             >
                                                 <div className="relative">
-                                                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={16} />
+                                                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={16} />
                                                     <input
-                                                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-11 pr-4 py-3 text-sm text-white focus:border-emerald-500/30 outline-none transition-all"
+                                                        className="w-full bg-gray-50 dark:bg-[#0e0e13] border border-gray-200 dark:border-white/5 rounded-xl pl-11 pr-4 py-3 text-sm text-gray-900 dark:text-white focus:border-emerald-300 outline-none transition-all"
                                                         value={name}
                                                         onChange={(e) => setName(e.target.value)}
                                                         placeholder="Name"
                                                     />
                                                 </div>
                                                 <div className="relative">
-                                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={16} />
+                                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={16} />
                                                     <input
                                                         type="password"
-                                                        className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-11 pr-4 py-3 text-sm text-white focus:border-emerald-500/30 outline-none transition-all"
+                                                        className="w-full bg-gray-50 dark:bg-[#0e0e13] border border-gray-200 dark:border-white/5 rounded-xl pl-11 pr-4 py-3 text-sm text-gray-900 dark:text-white focus:border-emerald-300 outline-none transition-all"
                                                         value={password}
                                                         onChange={(e) => setPassword(e.target.value)}
                                                         placeholder="New Password (optional)"
@@ -305,14 +305,14 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setIsEditing(false)}
-                                                        className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-zinc-400 rounded-xl text-xs font-bold transition-all"
+                                                        className="flex-1 py-3 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 text-gray-500 dark:text-zinc-400 rounded-xl text-xs font-bold transition-all"
                                                     >
                                                         Cancel
                                                     </button>
                                                     <button
                                                         onClick={handleUpdate}
                                                         disabled={loading || uploading}
-                                                        className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
+                                                        className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-gray-900 dark:text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
                                                     >
                                                         {loading ? <Loader2 className="animate-spin mx-auto" size={18} /> : "Save"}
                                                     </button>
@@ -326,29 +326,29 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                                                 exit={{ opacity: 0, scale: 0.98 }}
                                                 className="w-full space-y-3"
                                             >
-                                                <div className="bg-white/[0.03] border border-white/[0.05] p-4 rounded-2xl flex items-center gap-3">
-                                                    <div className="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-500">
+                                                <div className="bg-gray-50 dark:bg-[#0e0e13] border border-gray-200 dark:border-white/5 p-4 rounded-2xl flex items-center gap-3">
+                                                    <div className="p-2.5 bg-emerald-50 rounded-xl text-emerald-500">
                                                         <UserIcon size={18} />
                                                     </div>
                                                     <div className="overflow-hidden">
-                                                        <p className="text-[9px] uppercase font-black text-zinc-600 tracking-widest">Name</p>
-                                                        <p className="text-sm font-bold text-white truncate">{displayUser?.name}</p>
+                                                        <p className="text-[9px] uppercase font-black text-gray-400 dark:text-zinc-500 tracking-widest">Name</p>
+                                                        <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{displayUser?.name}</p>
                                                     </div>
                                                 </div>
-                                                <div className="bg-white/[0.03] border border-white/[0.05] p-4 rounded-2xl flex items-center gap-3">
-                                                    <div className="p-2.5 bg-zinc-800 rounded-xl text-zinc-500">
+                                                <div className="bg-gray-50 dark:bg-[#0e0e13] border border-gray-200 dark:border-white/5 p-4 rounded-2xl flex items-center gap-3">
+                                                    <div className="p-2.5 bg-gray-100 dark:bg-white/5 rounded-xl text-gray-400 dark:text-zinc-500">
                                                         <Mail size={18} />
                                                     </div>
                                                     <div className="overflow-hidden">
-                                                        <p className="text-[9px] uppercase font-black text-zinc-600 tracking-widest">Email</p>
-                                                        <p className="text-sm font-bold text-zinc-400 truncate">{displayUser?.email}</p>
+                                                        <p className="text-[9px] uppercase font-black text-gray-400 dark:text-zinc-500 tracking-widest">Email</p>
+                                                        <p className="text-sm font-bold text-gray-500 dark:text-zinc-400 truncate">{displayUser?.email}</p>
                                                     </div>
                                                 </div>
 
                                                 {isCurrentUser && (
                                                     <button
                                                         onClick={() => setIsEditing(true)}
-                                                        className="w-full mt-2 py-4 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white border border-emerald-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-[0.98]"
+                                                        className="w-full mt-2 py-4 bg-emerald-50 hover:bg-emerald-500 text-emerald-500 hover:text-gray-900 dark:text-white dark:hover:text-white border border-emerald-200 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-[0.98]"
                                                     >
                                                         Edit Profile
                                                     </button>

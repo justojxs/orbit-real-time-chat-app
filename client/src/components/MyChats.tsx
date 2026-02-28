@@ -1,9 +1,24 @@
 import { useEffect, useState } from "react";
 import api from "../lib/axios";
 import { useChatStore } from "../store/useChatStore";
-import { Plus, Pin, BadgeCheck } from "lucide-react";
+import { Plus, Pin, BadgeCheck, MessageSquare } from "lucide-react";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Compact relative time formatter
+const formatRelativeTime = (dateStr: string) => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "now";
+    if (diffMins < 60) return `${diffMins}m`;
+    const diffHrs = Math.floor(diffMins / 60);
+    if (diffHrs < 24) return `${diffHrs}h`;
+    const diffDays = Math.floor(diffHrs / 24);
+    if (diffDays < 7) return date.toLocaleDateString([], { weekday: 'short' });
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+};
 
 const MyChats = () => {
     const [loading, setLoading] = useState(true);
@@ -80,25 +95,33 @@ const MyChats = () => {
     }) : [];
 
     return (
-        <div className={`flex flex-col items-center p-3 py-6 bg-[#0c0c0e]/60 backdrop-blur-xl w-full md:w-[32%] h-full border-r border-white/5 ${selectedChat ? "hidden md:flex" : "flex"}`}>
-            <div className="pb-6 px-4 flex w-full justify-between items-center">
-                <h1 className="text-2xl font-bold text-white tracking-tighter">Messages</h1>
+        <div className={`flex flex-col p-0 bg-white/80 dark:bg-[#0a0a0f]/80 backdrop-blur-sm w-full md:w-[32%] h-full border-r border-gray-200/60 dark:border-white/[0.04] ${selectedChat ? "hidden md:flex" : "flex"}`}>
+            <div className="py-5 px-5 flex w-full justify-between items-center border-b border-gray-200/60 dark:border-white/[0.04]">
+                <div>
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Messages</h1>
+                    {sortedChats.length > 0 && (
+                        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 dark:text-zinc-500 mt-0.5">{sortedChats.length} conversation{sortedChats.length !== 1 ? 's' : ''}</p>
+                    )}
+                </div>
                 <GroupChatModal>
-                    <button className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/20 hover:bg-emerald-500/20 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
-                        <Plus size={14} strokeWidth={3} /> New Group
+                    <button className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-3.5 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95">
+                        <Plus size={14} strokeWidth={2.5} /> Group
                     </button>
                 </GroupChatModal>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar w-full">
+            <div className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5 custom-scrollbar w-full">
                 <AnimatePresence initial={false}>
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center h-full text-zinc-400 gap-3">
-                            <div className="w-8 h-8 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="flex flex-col items-center justify-center h-full text-gray-400 dark:text-zinc-500 gap-3">
+                            <div className="w-7 h-7 border-2 border-gray-300 dark:border-white/10 border-t-emerald-500 rounded-full animate-spin"></div>
                         </div>
                     ) : sortedChats.length > 0 ? (
                         sortedChats.map((chat: any) => {
                             const isPinned = chat.pinnedBy?.includes(user?._id);
+                            const isActive = selectedChat?._id === chat._id;
+                            const unreadCount = notification.filter((n: any) => n.chat._id === chat._id).length;
+                            const hasUnread = unreadCount > 0 && !isActive;
                             return (
                                 <motion.div
                                     layout
@@ -106,82 +129,87 @@ const MyChats = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     onClick={() => setSelectedChat(chat)}
                                     key={chat._id}
-                                    className={`cursor-pointer px-4 py-4 rounded-2xl transition-all border group relative overflow-hidden ${selectedChat?._id === chat._id
-                                        ? "bg-white/[0.08] border-white/[0.1] shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
-                                        : "bg-transparent border-transparent hover:bg-white/[0.04] hover:border-white/[0.05]"
-                                        } active:scale-[0.98]`}
+                                    className={`cursor-pointer px-3 py-3 rounded-xl transition-all border group relative ${isActive
+                                        ? "bg-emerald-50 border-emerald-200/60"
+                                        : "bg-transparent border-transparent hover:bg-gray-50 dark:bg-[#0e0e13] dark:hover:bg-white/5"
+                                        } active:scale-[0.99]`}
                                 >
-                                    {selectedChat?._id === chat._id && (
-                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-emerald-500 rounded-full" />
+                                    {isActive && (
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-emerald-500 rounded-r-full" />
                                     )}
 
                                     <div className="flex items-center gap-3 w-full">
-                                        <div className="relative">
+                                        <div className="relative flex-shrink-0">
                                             {!chat.isGroupChat ? (
                                                 <img
                                                     src={getSenderFull(chat.users)?.pic || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"}
-                                                    className="w-12 h-12 rounded-full object-cover shadow-sm border border-white/5 flex-shrink-0"
+                                                    className="w-11 h-11 rounded-full object-cover border border-gray-200 dark:border-white/5"
                                                     alt="avatar"
                                                 />
                                             ) : (
-                                                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-lg shadow-sm border border-emerald-500/30 flex-shrink-0">
+                                                <div className="w-11 h-11 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-base border border-emerald-200">
                                                     {chat.chatName[0]?.toUpperCase()}
                                                 </div>
                                             )}
                                             {isUserOnline(chat) && (
-                                                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-[#121214]"></div>
+                                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></div>
                                             )}
                                         </div>
 
-                                        <div className="flex flex-col flex-1 overflow-hidden ml-1">
-                                            <div className="flex justify-between items-center w-full">
-                                                <h3 className="font-semibold text-[15px] text-white truncate max-w-[70%] flex items-center gap-1.5">
+                                        <div className="flex flex-col flex-1 overflow-hidden min-w-0">
+                                            <div className="flex justify-between items-center w-full gap-2">
+                                                <h3 className={`font-semibold text-[14px] truncate flex items-center gap-1.5 ${isActive ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-zinc-200'}`}>
                                                     {!chat.isGroupChat
                                                         ? getSender(chat.users)
                                                         : chat.chatName}
-                                                    {!chat.isGroupChat && (getSenderFull(chat.users) as any).isVerified && (
-                                                        <BadgeCheck size={14} className="text-emerald-500 fill-emerald-500/10 shrink-0" />
+                                                    {!chat.isGroupChat && (getSenderFull(chat.users) as any)?.isVerified && (
+                                                        <BadgeCheck size={13} className="text-emerald-500 fill-emerald-500/10 shrink-0" />
                                                     )}
                                                 </h3>
-                                                <div className="flex items-center gap-2">
-                                                    {isPinned && <Pin size={12} className="text-emerald-500 fill-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}
-                                                    <button
-                                                        onClick={(e) => togglePin(chat._id, e)}
-                                                        className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/10 rounded-lg transition-all text-zinc-500 hover:text-emerald-400"
-                                                    >
-                                                        <Pin size={14} className={isPinned ? "fill-current" : ""} />
-                                                    </button>
+                                                <div className="flex items-center gap-1.5 shrink-0">
+                                                    {isPinned && <Pin size={10} className="text-emerald-500/60 fill-emerald-500/20" />}
+                                                    <span className={`text-[10px] font-medium tabular-nums ${hasUnread ? 'text-emerald-600' : 'text-gray-400 dark:text-zinc-500'}`}>
+                                                        {chat.latestMessage ? formatRelativeTime(chat.latestMessage.createdAt || chat.updatedAt) : ''}
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            <div className="flex justify-between items-center mt-1">
+                                            <div className="flex justify-between items-center mt-0.5">
                                                 {chat.latestMessage ? (
-                                                    <p className={`text-xs truncate max-w-[80%] ${selectedChat?._id === chat._id ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                                                        <span className="font-medium opacity-80">{chat.latestMessage.sender?.name?.split(' ')[0]}: </span>
-                                                        {chat.latestMessage.image ? "[Image]" : chat.latestMessage.fileUrl ? "[Document]" : chat.latestMessage.audioUrl ? "[Voice Note]" : chat.latestMessage.content}
+                                                    <p className={`text-xs truncate ${hasUnread ? 'text-gray-700 dark:text-zinc-200 font-medium' : 'text-gray-400 dark:text-zinc-500'}`}>
+                                                        <span className="opacity-60">{chat.latestMessage.sender?.name?.split(' ')[0]}: </span>
+                                                        {chat.latestMessage.image ? "Sent a photo" : chat.latestMessage.fileUrl ? "Shared a file" : chat.latestMessage.audioUrl ? "Voice message" : chat.latestMessage.content}
                                                     </p>
                                                 ) : (
-                                                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest opacity-60">No messages yet</p>
+                                                    <p className="text-[11px] text-gray-400 dark:text-zinc-500 italic">No messages yet</p>
                                                 )}
 
-                                                {notification.filter((n: any) => n.chat._id === chat._id).length > 0 && selectedChat?._id !== chat._id && (
-                                                    <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)] shrink-0 ml-2">
-                                                        <span className="text-[10px] text-white font-bold">{notification.filter((n: any) => n.chat._id === chat._id).length}</span>
+                                                {hasUnread && (
+                                                    <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 ml-2">
+                                                        <span className="text-[10px] text-white font-bold">{unreadCount}</span>
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
+
+                                        {/* Pin button on hover */}
+                                        <button
+                                            onClick={(e) => togglePin(chat._id, e)}
+                                            className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 rounded-lg transition-all text-gray-400 dark:text-zinc-500 hover:text-emerald-500 shrink-0"
+                                        >
+                                            <Pin size={13} className={isPinned ? "fill-current" : ""} />
+                                        </button>
                                     </div>
                                 </motion.div>
                             );
                         })
                     ) : (
-                        <div className="flex flex-col items-center justify-center h-full text-zinc-500 opacity-60 text-center px-4 mt-8">
-                            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                                <Plus size={24} className="text-zinc-400" />
+                        <div className="flex flex-col items-center justify-center h-full text-center px-6 py-16">
+                            <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-[#0e0e13] flex items-center justify-center mb-5 border border-gray-200 dark:border-white/5">
+                                <MessageSquare size={22} className="text-gray-400 dark:text-zinc-500" />
                             </div>
-                            <p className="text-sm font-medium">No active connections</p>
-                            <p className="text-xs mt-1">Search for a user to start encrypting.</p>
+                            <p className="text-sm font-semibold text-gray-700 dark:text-zinc-200 mb-1">No conversations yet</p>
+                            <p className="text-xs text-gray-400 dark:text-zinc-500 leading-relaxed">Search for a user or create a group to get started.</p>
                         </div>
                     )}
                 </AnimatePresence>

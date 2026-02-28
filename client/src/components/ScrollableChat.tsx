@@ -82,7 +82,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                 {parts.map((part, i) => (
                     <span
                         key={i}
-                        className={part.toLowerCase() === highlight.toLowerCase() ? "bg-emerald-500/40 text-white font-bold px-0.5 rounded" : ""}
+                        className={part.toLowerCase() === highlight.toLowerCase() ? "bg-emerald-500/40 text-gray-900 dark:text-white font-bold px-0.5 rounded" : ""}
                     >
                         {part}
                     </span>
@@ -107,17 +107,17 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                         <React.Fragment key={m._id || i}>
                             {showDateMarker && (
                                 <div className="flex justify-center my-6 w-full animate-fade-in-up">
-                                    <span className="bg-black/20 backdrop-blur-3xl text-zinc-500 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/5 shadow-2xl">
+                                    <span className="bg-white/80 dark:bg-[#0a0a0f]/80 backdrop-blur-3xl text-gray-500 dark:text-zinc-400 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-gray-200 dark:border-white/5 shadow-sm">
                                         {messageDate === new Date().toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' }) ? "Today" : messageDate}
                                     </span>
                                 </div>
                             )}
 
                             {firstUnreadId === m._id && (
-                                <div className="flex items-center w-full my-6 bg-[#0c0c0e] animate-fade-in">
-                                    <div className="flex-1 border-t border-emerald-500/30 border-dashed"></div>
-                                    <span className="px-4 text-[10px] font-bold uppercase tracking-widest text-emerald-400">Unread Messages</span>
-                                    <div className="flex-1 border-t border-emerald-500/30 border-dashed"></div>
+                                <div className="flex items-center w-full my-6 bg-[#f7f8fa] animate-fade-in">
+                                    <div className="flex-1 border-t border-emerald-300 border-dashed"></div>
+                                    <span className="px-4 text-[10px] font-bold uppercase tracking-widest text-emerald-500">Unread Messages</span>
+                                    <div className="flex-1 border-t border-emerald-300 border-dashed"></div>
                                 </div>
                             )}
 
@@ -126,8 +126,8 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                     className="flex justify-center my-4 w-full animate-fade-in"
                                     ref={(el) => (messageRefs.current[m._id] = el)}
                                 >
-                                    <div className="bg-white/5 backdrop-blur-3xl border border-white/5 shadow-2xl px-6 py-2.5 rounded-full flex items-center justify-center">
-                                        <span className="text-zinc-400 text-[11px] font-bold uppercase tracking-widest text-center">
+                                    <div className="bg-white/90 dark:bg-[#0a0a0f]/90 backdrop-blur-3xl border border-gray-200 dark:border-white/5 shadow-sm px-6 py-2.5 rounded-full flex items-center justify-center">
+                                        <span className="text-gray-500 dark:text-zinc-400 text-[11px] font-bold uppercase tracking-widest text-center">
                                             {m.content}
                                         </span>
                                     </div>
@@ -139,11 +139,11 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                 >
                                     <div className={`flex flex-col ${isMyMessage ? "items-end" : "items-start"} max-w-[80%] sm:max-w-[65%] transition-all ${isTarget ? 'scale-105' : ''}`}>
                                         <div
-                                            className={`px-5 py-4 rounded-[1.5rem] text-[14px] shadow-2xl relative group transition-all ${isTarget ? 'ring-2 ring-emerald-500 ring-offset-4 ring-offset-[#0d0d12]' : ''} ${isMyMessage
-                                                ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-tr-none shadow-emerald-500/10"
+                                            className={`px-5 py-4 rounded-[1.5rem] text-[14px] shadow-sm relative group transition-all ${isTarget ? 'ring-2 ring-emerald-500 ring-offset-4 ring-offset-white' : ''} ${isMyMessage
+                                                ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-gray-900 dark:text-white rounded-tr-none shadow-emerald-500/10"
                                                 : m.isDeleted
-                                                    ? "bg-zinc-900/40 text-zinc-600 border border-white/5 italic"
-                                                    : "bg-white/[0.04] backdrop-blur-3xl text-zinc-100 rounded-tl-none border border-white/[0.05] shadow-black/20"
+                                                    ? "bg-gray-50 dark:bg-[#0e0e13] text-gray-400 dark:text-zinc-500 border border-gray-200 dark:border-white/5 italic"
+                                                    : "bg-white dark:bg-[#0a0a0f] backdrop-blur-3xl text-gray-700 dark:text-zinc-200 rounded-tl-none border border-gray-200 dark:border-white/5 shadow-sm"
                                                 }`}
                                         >
                                             {/* Action Menu (My Messages) */}
@@ -155,12 +155,12 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                                 e.stopPropagation();
                                                                 setOpenReactionId(openReactionId === m._id ? null : m._id);
                                                             }}
-                                                            className="p-2 bg-zinc-900/80 rounded-xl hover:text-emerald-500 transition-colors border border-white/5"
+                                                            className="p-2 bg-gray-50 dark:bg-[#0e0e13] rounded-xl hover:text-emerald-500 transition-colors border border-gray-200 dark:border-white/5"
                                                         >
                                                             <Smile size={16} />
                                                         </button>
                                                         {openReactionId === m._id && (
-                                                            <div className="absolute bottom-full mb-2 bg-[#121217] border border-white/10 p-1.5 rounded-2xl flex gap-1 shadow-2xl z-50">
+                                                            <div className="absolute bottom-full mb-2 bg-white dark:bg-[#0a0a0f] border border-gray-200 dark:border-white/5 p-1.5 rounded-2xl flex gap-1 shadow-lg z-50">
                                                                 {COMMON_REACTIONS.map(emoji => (
                                                                     <button
                                                                         key={emoji}
@@ -179,7 +179,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                     </div>
                                                     <button
                                                         onClick={() => setMessageToDelete(m._id)}
-                                                        className="p-2 bg-zinc-900/80 rounded-xl hover:text-red-500 transition-colors border border-white/5"
+                                                        className="p-2 bg-gray-50 dark:bg-[#0e0e13] rounded-xl hover:text-red-500 transition-colors border border-gray-200 dark:border-white/5"
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
@@ -188,7 +188,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
 
                                             {/* Attachment Handling */}
                                             {!m.isDeleted && m.image && (
-                                                <div className="mb-3 -mx-2 -mt-2 rounded-[1rem] overflow-hidden border border-white/10 bg-black/40">
+                                                <div className="mb-3 -mx-2 -mt-2 rounded-[1rem] overflow-hidden border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-white/5">
                                                     <img
                                                         src={m.image}
                                                         alt="attachment"
@@ -198,19 +198,19 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                             )}
 
                                             {!m.isDeleted && m.fileUrl && (
-                                                <div className="mb-3 -mx-2 -mt-2 bg-black/20 p-4 rounded-[1.2rem] border border-white/5 flex items-center gap-4 group/file">
-                                                    <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                                                <div className="mb-3 -mx-2 -mt-2 bg-gray-50 dark:bg-[#0e0e13] p-4 rounded-[1.2rem] border border-gray-200 dark:border-white/5 flex items-center gap-4 group/file">
+                                                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-200">
                                                         <FileText size={24} />
                                                     </div>
                                                     <div className="flex-1 overflow-hidden">
-                                                        <p className="text-xs font-bold text-white truncate max-w-[150px]">{m.fileName}</p>
-                                                        <p className="text-[9px] uppercase font-black text-zinc-500 tracking-widest mt-0.5">{m.fileType?.split('/')[1] || 'FILE'}</p>
+                                                        <p className="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[150px]">{m.fileName}</p>
+                                                        <p className="text-[9px] uppercase font-black text-gray-400 dark:text-zinc-500 tracking-widest mt-0.5">{m.fileType?.split('/')[1] || 'FILE'}</p>
                                                     </div>
                                                     <a
                                                         href={m.fileUrl}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="p-2.5 bg-white/5 hover:bg-emerald-500 hover:text-white rounded-lg transition-all"
+                                                        className="p-2.5 bg-gray-100 dark:bg-white/5 hover:bg-emerald-500 hover:text-gray-900 dark:text-white dark:hover:text-white rounded-lg transition-all"
                                                     >
                                                         <Download size={16} />
                                                     </a>
@@ -218,15 +218,15 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                             )}
 
                                             {!m.isDeleted && m.audioUrl && (
-                                                <div className="mb-3 -mx-2 -mt-2 bg-black/20 p-3 rounded-[1.2rem] border border-white/5 flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400">
+                                                <div className="mb-3 -mx-2 -mt-2 bg-gray-50 dark:bg-[#0e0e13] p-3 rounded-[1.2rem] border border-gray-200 dark:border-white/5 flex items-center gap-3">
+                                                    <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-500">
                                                         <Mic size={20} />
                                                     </div>
                                                     <div className="flex-1">
                                                         <audio
                                                             controls
                                                             src={m.audioUrl}
-                                                            className="h-8 w-full brightness-90 contrast-125 saturate-150 rounded-full [&::-webkit-media-controls-enclosure]:bg-emerald-500/10 [&::-webkit-media-controls-panel]:bg-transparent"
+                                                            className="h-8 w-full brightness-90 contrast-125 saturate-150 rounded-full [&::-webkit-media-controls-enclosure]:bg-emerald-50 [&::-webkit-media-controls-panel]:bg-transparent"
                                                         />
                                                     </div>
                                                 </div>
@@ -248,7 +248,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                         {m.readBy && (selectedChat.isGroupChat ? m.readBy.length >= selectedChat.users.length : m.readBy.length > 1) ? (
                                                             <CheckCheck size={16} className="text-blue-400 stroke-[2.5]" />
                                                         ) : (
-                                                            <CheckCheck size={16} className="text-gray-400 stroke-[2.5]" />
+                                                            <CheckCheck size={16} className="text-gray-400 dark:text-zinc-500 stroke-[2.5]" />
                                                         )}
                                                     </span>
                                                 )}
@@ -261,7 +261,7 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                                                 {m.reactions.map((r: any, idx: number) => (
                                                     <div
                                                         key={idx}
-                                                        className="bg-zinc-800/80 border border-white/5 px-2 py-0.5 rounded-full text-[12px] flex items-center shadow-lg cursor-default hover:scale-110 transition-transform"
+                                                        className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 px-2 py-0.5 rounded-full text-[12px] flex items-center shadow-sm cursor-default hover:scale-110 transition-transform"
                                                         title={r.user.name}
                                                     >
                                                         {r.emoji}
@@ -284,29 +284,29 @@ const ScrollableChat = ({ messages, socket, activeMessageId, searchQuery, setMes
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm"
                         onClick={() => setMessageToDelete(null)}
                     >
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0, y: 10 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.95, opacity: 0, y: 10 }}
-                            className="bg-[#121217] w-full max-w-sm rounded-[2rem] border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                            className="bg-white dark:bg-[#0a0a0f] w-full max-w-sm rounded-[2rem] border border-gray-300 dark:border-white/10 shadow-xl overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="p-6 text-center space-y-4">
                                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto border border-red-500/20">
                                     <Trash2 size={28} className="text-red-500" />
                                 </div>
-                                <h3 className="text-xl font-bold text-white tracking-tight">Delete Message?</h3>
-                                <p className="text-zinc-400 text-sm px-2">
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Delete Message?</h3>
+                                <p className="text-gray-500 dark:text-zinc-400 text-sm px-2">
                                     Are you sure you want to permanently delete this message for everyone in the chat? This action cannot be undone.
                                 </p>
                             </div>
-                            <div className="flex border-t border-white/[0.05] bg-white/[0.02]">
+                            <div className="flex border-t border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-[#0e0e13]">
                                 <button
                                     onClick={() => setMessageToDelete(null)}
-                                    className="flex-1 py-4 text-zinc-400 font-medium hover:text-white hover:bg-white/[0.02] transition-colors border-r border-white/[0.05]"
+                                    className="flex-1 py-4 text-gray-500 dark:text-zinc-400 font-medium hover:text-gray-900 dark:text-white dark:hover:text-white hover:bg-gray-50 dark:bg-[#0e0e13] dark:hover:bg-white/5 transition-colors border-r border-gray-200 dark:border-white/5"
                                 >
                                     Cancel
                                 </button>

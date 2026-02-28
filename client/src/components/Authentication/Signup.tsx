@@ -108,9 +108,9 @@ const Signup = () => {
     return (
         <div className="space-y-4 animate-scale-in">
             <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Full Name</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Full Name</label>
                 <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-emerald-500 transition-colors" size={18} />
                     <input
                         placeholder="John Doe"
                         className="glass-input pl-12"
@@ -122,9 +122,9 @@ const Signup = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Email</label>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Email</label>
                     <div className="relative group">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-emerald-500 transition-colors" size={18} />
                         <input
                             type="email"
                             placeholder="email@example.com"
@@ -136,14 +136,14 @@ const Signup = () => {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Profile Picture (Optional)</label>
-                    <label className="flex items-center gap-3 px-4 py-3.5 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.1] rounded-2xl cursor-pointer transition-all group overflow-hidden relative">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Profile Picture (Optional)</label>
+                    <label className="flex items-center gap-3 px-4 py-3.5 bg-gray-50 dark:bg-[#0e0e13] border border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 hover:border-gray-300 dark:border-white/10 dark:hover:border-white/20 rounded-2xl cursor-pointer transition-all group overflow-hidden relative">
                         {pic ? (
                             <CheckCircle2 className="text-emerald-500 transition-transform animate-scale-in" size={20} />
                         ) : (
-                            <Camera className="text-zinc-600 group-hover:text-emerald-500 transition-colors" size={20} />
+                            <Camera className="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-500 transition-colors" size={20} />
                         )}
-                        <span className={`text-sm font-medium transition-colors ${pic ? 'text-emerald-400' : 'text-zinc-500 group-hover:text-zinc-300'}`}>
+                        <span className={`text-sm font-medium transition-colors ${pic ? 'text-emerald-500' : 'text-gray-400 dark:text-zinc-500 group-hover:text-gray-600 dark:text-zinc-300'}`}>
                             {pic ? "Image Ready" : "Upload Shot"}
                         </span>
                         <input
@@ -158,9 +158,9 @@ const Signup = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Password</label>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Password</label>
                     <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-emerald-500 transition-colors" size={18} />
                         <input
                             type="password"
                             placeholder="••••••••"
@@ -171,9 +171,9 @@ const Signup = () => {
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Verify</label>
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Verify</label>
                     <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-emerald-500 transition-colors" size={18} />
                         <input
                             type="password"
                             placeholder="••••••••"
@@ -196,10 +196,10 @@ const Signup = () => {
 
                 <div className="relative py-4">
                     <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-white/5"></span>
+                        <span className="w-full border-t border-gray-200 dark:border-white/5"></span>
                     </div>
                     <div className="relative flex justify-center text-[9px] font-bold uppercase tracking-widest">
-                        <span className="bg-[#09090b] px-4 text-zinc-500">Or continue with</span>
+                        <span className="bg-[#f7f8fa] px-4 text-gray-400 dark:text-zinc-500">Or continue with</span>
                     </div>
                 </div>
 
@@ -207,7 +207,7 @@ const Signup = () => {
                     <GoogleLogin
                         onSuccess={handleGoogleSuccess}
                         onError={() => alert('Google Signup Failed')}
-                        theme="filled_black"
+                        theme="outline"
                         shape="pill"
                         text="signup_with"
                         width="100%"

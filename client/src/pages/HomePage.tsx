@@ -1,216 +1,190 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
 import { motion, AnimatePresence } from "framer-motion";
+import { Shield, Zap, Globe, Users, MessageCircle, Bot, Lock } from "lucide-react";
+import ThemeToggle from "../components/ThemeToggle";
+
+const HIGHLIGHTS = [
+    { icon: Zap, text: "Real-time WebSocket messaging" },
+    { icon: Shield, text: "End-to-end encrypted conversations" },
+    { icon: Bot, text: "Built-in AI assistant (Orbit AI)" },
+    { icon: Users, text: "Group chats & file sharing" },
+    { icon: Globe, text: "Voice notes & live whiteboard" },
+];
 
 const HomePage = () => {
     const [view, setView] = useState<"login" | "signup">("login");
-    const [isScrolled, setIsScrolled] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 100);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
-    // Intercepts hero button presses to smoothly slide the user down to the authentication panels.
-    const scrollToAuth = () => {
-        const authSection = document.getElementById("auth-section");
-        authSection?.scrollIntoView({ behavior: "smooth" });
-    };
-
-    // Dynamically mounts the correct authentication sub-component (Login vs Signup) driven by user state.
-    // Encapsulates the outer Framer Motion layout styling necessary for the entry effect.
-    const renderAuth = (type: "login" | "signup") => (
-        <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-md glass-panel p-1 border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] bg-[#0c0c0e]/80"
-        >
-            <div className="p-8">
-                <div className="flex mb-8 bg-zinc-900/50 p-1 rounded-2xl border border-white/5 relative overflow-hidden">
-                    <motion.div
-                        animate={{ x: type === "login" ? "0%" : "100%" }}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-emerald-500 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-                    />
-                    <button
-                        onClick={() => setView("login")}
-                        className={`flex-1 py-3 rounded-xl text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${type === "login" ? "text-white" : "text-zinc-500 hover:text-white"}`}
-                    >
-                        Log In
-                    </button>
-                    <button
-                        onClick={() => setView("signup")}
-                        className={`flex-1 py-3 rounded-xl text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${type === "signup" ? "text-white" : "text-zinc-500 hover:text-white"}`}
-                    >
-                        Sign Up
-                    </button>
-                </div>
-
-                <div className="min-h-[420px]">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={type}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            {type === "login" ? <Login /> : <Signup />}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-            </div>
-        </motion.div>
-    );
 
     return (
-        <div className="flex flex-col w-full text-zinc-100 relative font-sans bg-[#0d0d12] min-h-[200vh] selection:bg-emerald-500/30 selection:text-emerald-100">
-            {/* Ultra-Premium Background */}
-            <div className="fixed inset-0 z-0 premium-bg pointer-events-none"></div>
+        <div className="flex min-h-screen w-full bg-[#f7f8fa] dark:bg-[#08080c] text-gray-900 dark:text-white font-sans selection:bg-emerald-500/20 selection:text-emerald-900 relative overflow-hidden">
+            {/* Theme Toggle Top Right */}
+            <div className="absolute top-6 right-6 z-[100]">
+                <ThemeToggle />
+            </div>
 
-            {/* Premium Sticky Navbar */}
-            <nav className={`fixed top-0 w-full z-50 transition-all duration-700 px-6 py-4 flex justify-center ${isScrolled ? "translate-y-0" : "-translate-y-full opacity-0"}`}>
-                <div className="w-full max-w-5xl glass-panel px-6 py-3 flex justify-between items-center rounded-2xl border-white/10">
-                    <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-                        <img src="/logo.png" className="w-8 h-8 object-contain group-hover:rotate-[360deg] transition-transform duration-700" alt="Orbit Logo" />
-                        <span className="text-xl font-bold tracking-tighter text-white">ORBIT</span>
-                    </div>
+            {/* Background image */}
+            <div
+                className="fixed inset-0 z-0 pointer-events-none"
+                style={{
+                    backgroundImage: 'url(/bg-mesh.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    opacity: 0.7,
+                }}
+            />
 
-                    <div className="flex gap-8 items-center">
-                        <button
-                            onClick={() => { setView("login"); scrollToAuth(); }}
-                            className="text-xs font-bold tracking-widest uppercase text-zinc-400 hover:text-emerald-400 transition-colors"
-                        >
-                            Log In
-                        </button>
-                        <button
-                            onClick={() => { setView("signup"); scrollToAuth(); }}
-                            className="px-6 py-2.5 text-xs font-bold tracking-widest uppercase bg-emerald-500 text-white rounded-xl hover:bg-emerald-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] active:scale-95 hover:scale-105"
-                        >
-                            Sign Up
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            {/* Left panel — Brand */}
+            <div className="hidden lg:flex flex-col justify-between w-[55%] p-12 xl:p-16 relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex items-center gap-3"
+                >
+                    <img src="/logo.png" className="w-9 h-9 object-contain" alt="Orbit" />
+                    <span className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">ORBIT</span>
+                </motion.div>
 
-            <div className="relative z-10 w-full">
-                {/* Hero Section */}
-                <section className="h-screen w-full flex flex-col items-center justify-center px-6 relative overflow-hidden">
-                    {/* Lightweight Static Ambient Glow */}
-                    <div className="absolute top-1/4 -left-20 w-96 h-96 bg-emerald-500/[0.04] rounded-full pointer-events-none" style={{ filter: 'blur(80px)' }} />
-                    <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-teal-500/[0.03] rounded-full pointer-events-none" style={{ filter: 'blur(80px)' }} />
+                <div className="flex-1 flex flex-col justify-center max-w-xl">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                    >
+                        <h1 className="text-5xl xl:text-6xl font-bold tracking-tight text-gray-900 dark:text-white leading-[1.1] mb-6">
+                            Where teams
+                            <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">communicate</span>
+                            <br />
+                            without limits.
+                        </h1>
+                        <p className="text-lg text-gray-500 dark:text-zinc-400 font-medium leading-relaxed mb-10 max-w-md">
+                            Orbit is the messaging platform engineered for speed, privacy, and intelligence. Everything you need to collaborate — in one place.
+                        </p>
+                    </motion.div>
 
-                    <div className="max-w-4xl w-full flex flex-col items-center relative z-10">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-                            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                            className="mb-12 relative group"
-                        >
-                            <div className="absolute inset-0 bg-emerald-500/20 blur-[100px] group-hover:bg-emerald-500/40 transition-colors duration-1000"></div>
-                            <img
-                                src="/logo.png"
-                                className="w-32 h-32 md:w-48 md:h-48 object-contain relative animate-float transition-all hover:scale-110 duration-500 cursor-pointer"
-                                alt="Orbit Logo"
-                                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                            />
-                        </motion.div>
-
-                        <motion.div
-                            initial="hidden"
-                            animate="visible"
-                            variants={{
-                                hidden: { opacity: 0 },
-                                visible: {
-                                    opacity: 1,
-                                    transition: { staggerChildren: 0.1, delayChildren: 0.3 }
-                                }
-                            }}
-                            className="flex flex-col items-center"
-                        >
-                            <motion.h1
-                                variants={{
-                                    hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
-                                    visible: { opacity: 1, y: 0, filter: "blur(0px)" }
-                                }}
-                                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                                className="text-7xl md:text-[10rem] font-bold tracking-tighter text-white mb-6 text-center leading-[0.8] select-none"
-                            >
-                                ORBIT<span className="text-emerald-500">.</span>
-                            </motion.h1>
-
-                            <motion.p
-                                variants={{
-                                    hidden: { opacity: 0, y: 20 },
-                                    visible: { opacity: 1, y: 0 }
-                                }}
-                                transition={{ duration: 0.8 }}
-                                className="text-xl md:text-2xl text-zinc-400 font-medium tracking-tight mb-12 text-center max-w-xl leading-relaxed"
-                            >
-                                Next-generation messaging dedicated to <span className="text-white hover:text-emerald-400 transition-colors cursor-default">speed</span>, <span className="text-white hover:text-emerald-400 transition-colors cursor-default">clarity</span>, and <span className="text-white hover:text-emerald-400 transition-colors cursor-default">style</span>.
-                            </motion.p>
-
-                            <motion.button
-                                variants={{
-                                    hidden: { opacity: 0, scale: 0.9 },
-                                    visible: { opacity: 1, scale: 1 }
-                                }}
-                                whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(16,185,129,0.4)" }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => { setView("login"); scrollToAuth(); }}
-                                className="group px-12 py-5 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl font-bold tracking-widest uppercase text-xs transition-all flex items-center gap-3 shadow-xl"
-                            >
-                                Get Started
-                                <motion.svg
-                                    animate={{ x: [0, 5, 0] }}
-                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                                    className="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </motion.svg>
-                            </motion.button>
-                        </motion.div>
-                    </div>
-
-                    {/* Optimized Scroll Hint */}
-                    <div className="absolute bottom-12 flex flex-col items-center gap-3 opacity-30 select-none">
-                        <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-zinc-500">Scroll Down</span>
-                        <div className="w-1 h-12 rounded-full overflow-hidden bg-white/10 relative">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4, duration: 0.6 }}
+                        className="space-y-3"
+                    >
+                        {HIGHLIGHTS.map((h, i) => (
                             <motion.div
-                                animate={{ translateY: [0, 32, 0] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute top-0 w-full h-1/3 bg-emerald-500 rounded-full"
-                            />
+                                key={i}
+                                initial={{ opacity: 0, x: -15 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.5 + i * 0.06 }}
+                                className="flex items-center gap-3 group"
+                            >
+                                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 group-hover:bg-emerald-100 transition-colors">
+                                    <h.icon size={15} />
+                                </div>
+                                <span className="text-sm text-gray-600 dark:text-zinc-300 font-medium">{h.text}</span>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                </div>
+
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="flex items-center gap-6"
+                >
+                    <div className="flex items-center gap-2 text-gray-400 dark:text-zinc-500">
+                        <Lock size={12} />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.15em]">256-bit Encryption</span>
+                    </div>
+                    <div className="w-1 h-1 rounded-full bg-gray-300" />
+                    <div className="flex items-center gap-2 text-gray-400 dark:text-zinc-500">
+                        <MessageCircle size={12} />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.15em]">WebSocket Powered</span>
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* Right panel — Auth */}
+            <div className="flex-1 flex items-center justify-center p-6 sm:p-10 lg:p-12 relative z-10">
+                <div className="w-full max-w-[440px]">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center gap-3 mb-10 lg:hidden"
+                    >
+                        <img src="/logo.png" className="w-8 h-8 object-contain" alt="Orbit" />
+                        <span className="text-lg font-bold tracking-tighter text-gray-900 dark:text-white">ORBIT</span>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+                    >
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
+                                {view === "login" ? "Welcome back" : "Create your account"}
+                            </h2>
+                            <p className="text-sm text-gray-500 dark:text-zinc-400 font-medium">
+                                {view === "login"
+                                    ? "Enter your credentials to access your workspace."
+                                    : "Join thousands of teams already on Orbit."}
+                            </p>
                         </div>
-                    </div>
-                </section>
 
-                {/* Auth Section */}
-                <section id="auth-section" className="min-h-screen w-full flex flex-col items-center justify-center py-32 px-6">
-                    <div className="mb-16 text-center">
-                        <span className="text-emerald-500 text-xs font-bold tracking-[0.5em] uppercase mb-4 block">Secure Access</span>
-                        <h2 className="text-5xl md:text-6xl font-bold text-white tracking-tighter mb-4">Jump Into Orbit</h2>
-                        <p className="text-zinc-400 font-medium text-lg">Join the future of decentralized real-time communication.</p>
-                    </div>
-                    {renderAuth(view)}
-                </section>
+                        <div className="flex mb-8 bg-gray-100 dark:bg-white/5 p-1 rounded-xl border border-gray-200/60 dark:border-white/[0.04] relative overflow-hidden">
+                            <motion.div
+                                animate={{ x: view === "login" ? "0%" : "100%" }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-emerald-500 rounded-lg shadow-md"
+                            />
+                            <button
+                                onClick={() => setView("login")}
+                                className={`flex-1 py-2.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${view === "login" ? "text-white" : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200"}`}
+                            >
+                                Log In
+                            </button>
+                            <button
+                                onClick={() => setView("signup")}
+                                className={`flex-1 py-2.5 rounded-lg text-xs font-bold tracking-widest uppercase transition-colors duration-500 relative z-10 ${view === "signup" ? "text-white" : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200"}`}
+                            >
+                                Sign Up
+                            </button>
+                        </div>
 
-                <footer className="w-full py-16 px-6 border-t border-white/[0.05] flex flex-col items-center gap-8">
-                    <div className="flex items-center gap-2">
-                        <img src="/logo.png" className="w-6 h-6 grayscale opacity-30" alt="Orbit Logo" />
-                        <span className="text-sm font-bold tracking-tighter text-zinc-700">ORBIT ENGINE</span>
-                    </div>
-                    <p className="text-zinc-600 text-[10px] uppercase font-bold tracking-[0.4em]">Ojas Gupta DTU CSE 23/CS/290</p>
-                </footer>
+                        <div className="min-h-[400px]">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={view}
+                                    initial={{ opacity: 0, x: 15 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -15 }}
+                                    transition={{ duration: 0.25 }}
+                                >
+                                    {view === "login" ? <Login /> : <Signup />}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="mt-8 flex items-center justify-center gap-4 lg:hidden"
+                    >
+                        <div className="flex items-center gap-1.5 text-gray-400 dark:text-zinc-500">
+                            <Lock size={10} />
+                            <span className="text-[9px] font-bold uppercase tracking-[0.15em]">Encrypted</span>
+                        </div>
+                        <div className="w-1 h-1 rounded-full bg-gray-300" />
+                        <div className="flex items-center gap-1.5 text-gray-400 dark:text-zinc-500">
+                            <Zap size={10} />
+                            <span className="text-[9px] font-bold uppercase tracking-[0.15em]">Real-time</span>
+                        </div>
+                    </motion.div>
+                </div>
             </div>
         </div>
     );

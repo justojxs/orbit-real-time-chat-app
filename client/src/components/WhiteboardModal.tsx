@@ -198,7 +198,7 @@ const WhiteboardModal: React.FC<WhiteboardModalProps> = ({ isOpen, onClose, sock
                         </div>
                     </div>
 
-                    <div ref={containerRef} className="flex-1 w-full relative bg-white overflow-hidden cursor-crosshair">
+                    <div ref={containerRef} className="flex-1 w-full relative bg-white dark:bg-[#0a0a0f] overflow-hidden cursor-crosshair">
                         <canvas
                             ref={canvasRef}
                             className="absolute inset-0 touch-none"

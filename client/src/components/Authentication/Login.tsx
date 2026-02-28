@@ -69,9 +69,9 @@ const Login = () => {
     return (
         <div className="space-y-6 animate-scale-in">
             <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Email Address</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Email Address</label>
                 <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-emerald-500 transition-colors" size={18} />
                     <input
                         type="email"
                         placeholder="name@example.com"
@@ -83,9 +83,9 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 ml-1">Password</label>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Password</label>
                 <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-emerald-500 transition-colors" size={18} />
                     <input
                         type="password"
                         placeholder="••••••••"
@@ -106,7 +106,7 @@ const Login = () => {
                 </button>
 
                 <button
-                    className="w-full py-4 text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition-all flex items-center justify-center gap-2 group"
+                    className="w-full py-4 text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 transition-all flex items-center justify-center gap-2 group"
                     onClick={async () => {
                         setLoading(true);
                         try {
@@ -126,16 +126,16 @@ const Login = () => {
                         }
                     }}
                 >
-                    <UserIcon className="text-zinc-700 group-hover:text-emerald-500 transition-colors" size={14} />
+                    <UserIcon className="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-500 transition-colors" size={14} />
                     Start As Guest User
                 </button>
 
                 <div className="relative py-2">
                     <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-white/5"></span>
+                        <span className="w-full border-t border-gray-200 dark:border-white/5"></span>
                     </div>
                     <div className="relative flex justify-center text-[9px] font-bold uppercase tracking-widest">
-                        <span className="bg-[#09090b] px-4 text-zinc-500">Or continue with</span>
+                        <span className="bg-[#f7f8fa] px-4 text-gray-400 dark:text-zinc-500">Or continue with</span>
                     </div>
                 </div>
 
@@ -143,7 +143,7 @@ const Login = () => {
                     <GoogleLogin
                         onSuccess={handleGoogleSuccess}
                         onError={() => alert('Google Login Failed')}
-                        theme="filled_black"
+                        theme="outline"
                         shape="pill"
                         text="signin_with"
                         width="100%"

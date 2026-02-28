@@ -3,11 +3,20 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import ChatPage from "./pages/ChatPage";
 import { useChatStore } from "./store/useChatStore";
+import { useThemeStore } from "./store/useThemeStore";
 
 function App() {
   const { setUser, initSocket } = useChatStore();
+  const { theme } = useThemeStore();
 
   useEffect(() => {
+    // Initialize Theme
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     // Warm up the backend server on page load — critical for Render/Railway cold starts
     // This fires before the user even starts typing credentials
     const API_URL = import.meta.env.VITE_API_URL || "";

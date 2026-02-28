@@ -8,7 +8,7 @@ const ChatBox = () => {
     return (
         <div
             className={`${selectedChat ? "flex" : "hidden md:flex"} 
-                items-center flex-col glass-panel w-full md:w-[68%] rounded-[2rem] border-white/5 h-full relative overflow-hidden`}
+                items-center flex-col w-full md:w-[68%] bg-white/80 dark:bg-[#0a0a0f]/80 backdrop-blur-sm border border-gray-200/60 dark:border-white/[0.04] rounded-2xl h-full relative overflow-hidden shadow-sm`}
         >
             {selectedChat ? (
                 <SingleChat />

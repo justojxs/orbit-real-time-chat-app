@@ -48,7 +48,7 @@ connectDB().then(async () => {
     // Ensure Orbit AI user exists for the new AI feature
     try {
         const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
-        const aiAvatar = "https://res.cloudinary.com/dtga8lwj3/image/upload/v1772301117/bbzatm74zenqqve4kmkk.png";
+        const aiAvatar = "https://res.cloudinary.com/dtga8lwj3/image/upload/v1772301646/gxe2amf7zjvjc0r381ds.png";
 
         if (!orbitAI) {
             await User.create({

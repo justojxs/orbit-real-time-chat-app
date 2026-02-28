@@ -106,27 +106,27 @@ const GroupChatModal = ({ isOpen, onClose, children }: { isOpen?: boolean, onClo
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="bg-[#0c0c0e]/95 border border-white/[0.08] p-10 rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] w-full max-w-lg relative z-10 flex flex-col gap-8"
+                        className="bg-white/95 border border-gray-300 dark:border-white/10 p-10 rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.5)] w-full max-w-lg relative z-10 flex flex-col gap-8"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 border border-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
                                     <Users size={24} />
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-bold text-white tracking-tighter">New Group</h2>
-                                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-zinc-500 mt-1">Create Collaborative Space</p>
+                                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tighter">New Group</h2>
+                                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-gray-400 dark:text-zinc-500 mt-1">Create Collaborative Space</p>
                                 </div>
                             </div>
-                            <button onClick={handleClose} className="text-zinc-500 hover:text-white transition-all bg-white/5 p-2.5 rounded-2xl hover:bg-white/10">
+                            <button onClick={handleClose} className="text-gray-400 dark:text-zinc-500 hover:text-gray-900 dark:text-white dark:hover:text-white transition-all bg-gray-100 dark:bg-white/5 p-2.5 rounded-2xl hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20">
                                 <X size={20} />
                             </button>
                         </div>
 
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-bold tracking-widest text-zinc-600 ml-1">Group Identity</label>
+                                <label className="text-[10px] uppercase font-bold tracking-widest text-gray-400 dark:text-zinc-500 ml-1">Group Identity</label>
                                 <input
                                     className="glass-input"
                                     placeholder="Enter group name..."
@@ -136,9 +136,9 @@ const GroupChatModal = ({ isOpen, onClose, children }: { isOpen?: boolean, onClo
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase font-bold tracking-widest text-zinc-600 ml-1">Add Members</label>
+                                <label className="text-[10px] uppercase font-bold tracking-widest text-gray-400 dark:text-zinc-500 ml-1">Add Members</label>
                                 <div className="relative">
-                                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" />
+                                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" />
                                     <input
                                         className="glass-input pl-12"
                                         placeholder="Search by name or email"
@@ -154,10 +154,10 @@ const GroupChatModal = ({ isOpen, onClose, children }: { isOpen?: boolean, onClo
                                         initial={{ scale: 0.8, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
                                         key={u._id}
-                                        className="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-2 rounded-xl border border-emerald-500/20 group hover:border-emerald-500/50 transition-colors"
+                                        className="flex items-center gap-2 bg-emerald-50 text-emerald-500 text-xs font-bold px-3 py-2 rounded-xl border border-emerald-200 group hover:border-emerald-500/50 transition-colors"
                                     >
                                         {u.name}
-                                        <X size={14} className="cursor-pointer text-emerald-600 group-hover:text-emerald-400" onClick={() => handleDelete(u)} />
+                                        <X size={14} className="cursor-pointer text-emerald-600 group-hover:text-emerald-500" onClick={() => handleDelete(u)} />
                                     </motion.span>
                                 ))}
                             </div>
@@ -173,16 +173,16 @@ const GroupChatModal = ({ isOpen, onClose, children }: { isOpen?: boolean, onClo
                                             <div
                                                 key={userToAdd._id}
                                                 onClick={() => handleGroup(userToAdd)}
-                                                className="flex items-center justify-between p-3.5 bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl cursor-pointer transition-all border border-transparent hover:border-white/[0.08] group"
+                                                className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-[#0e0e13] hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-gray-300 dark:border-white/10 dark:hover:border-white/20 group"
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <img src={userToAdd.pic} alt={userToAdd.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                                                    <img src={userToAdd.pic} alt={userToAdd.name} className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-white/5" />
                                                     <div className="flex-1 overflow-hidden">
-                                                        <h4 className="text-sm font-bold text-zinc-100 truncate group-hover:text-emerald-400 transition-colors">{userToAdd.name}</h4>
-                                                        <p className="text-[10px] text-zinc-500 font-medium truncate uppercase tracking-tighter">{userToAdd.email}</p>
+                                                        <h4 className="text-sm font-bold text-gray-700 dark:text-zinc-200 truncate group-hover:text-emerald-500 transition-colors">{userToAdd.name}</h4>
+                                                        <p className="text-[10px] text-gray-400 dark:text-zinc-500 font-medium truncate uppercase tracking-tighter">{userToAdd.email}</p>
                                                     </div>
                                                 </div>
-                                                <Plus size={18} className="text-zinc-700 group-hover:text-emerald-500 transition-colors" />
+                                                <Plus size={18} className="text-gray-300 dark:text-zinc-600 group-hover:text-emerald-500 transition-colors" />
                                             </div>
                                         ))}
                                     </div>

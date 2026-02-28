@@ -530,10 +530,10 @@ const SingleChat = () => {
         <div className="w-full h-full flex flex-col pt-0 relative overflow-hidden">
             {selectedChat ? (
                 <>
-                    <div className="px-8 py-5 flex justify-between items-center w-full bg-white/[0.02] border-b border-white/[0.05] relative z-20">
+                    <div className="px-6 py-4 flex justify-between items-center w-full border-b border-gray-200/60 dark:border-white/[0.04] relative z-20">
                         <div className="flex items-center gap-4 flex-1">
                             <button
-                                className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 transition-colors mr-1"
+                                className="md:hidden flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 text-gray-500 dark:text-zinc-400 transition-colors mr-1"
                                 onClick={() => setSelectedChat("")}
                             >
                                 <ArrowLeft size={18} />
@@ -541,30 +541,30 @@ const SingleChat = () => {
                             {!selectedChat.isGroupChat ? (
                                 <>
                                     <div className="relative group">
-                                        <div className="absolute inset-0 bg-emerald-500/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        <div className="absolute inset-0 bg-emerald-500/10 blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                         <img
                                             src={getSenderFull(user, selectedChat.users).pic}
-                                            className="w-10 h-10 rounded-full object-cover relative border border-white/10"
+                                            className="w-10 h-10 rounded-full object-cover relative border border-gray-200 dark:border-white/5"
                                             alt="avatar"
                                         />
-                                        <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#121214] transition-colors ${getStatus() === 'Online' || isTyping ? 'bg-emerald-500' : 'bg-zinc-600'}`}></div>
+                                        <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white transition-colors ${getStatus() === 'Online' || isTyping ? 'bg-emerald-500' : 'bg-gray-300'}`}></div>
                                     </div>
                                     <div className="flex flex-col">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-bold text-white tracking-tight">{getSender(user, selectedChat.users)}</span>
+                                            <span className="font-bold text-gray-900 dark:text-white tracking-tight">{getSender(user, selectedChat.users)}</span>
                                             {getSenderFull(user, selectedChat.users).isVerified && (
                                                 <BadgeCheck size={16} className="text-emerald-500 fill-emerald-500/10" />
                                             )}
                                             <button
                                                 onClick={() => setIsProfileOpen(true)}
-                                                className="p-1 text-zinc-600 hover:text-emerald-500 transition-colors bg-white/5 hover:bg-emerald-500/10 rounded-lg outline-none"
+                                                className="p-1 text-gray-400 dark:text-zinc-500 hover:text-emerald-500 transition-colors bg-gray-50 dark:bg-[#0e0e13] hover:bg-emerald-50 rounded-lg outline-none"
                                             >
                                                 <Info size={14} />
                                             </button>
                                         </div>
                                         <div className="flex items-center gap-1.5 mt-0.5">
-                                            <div className={`w-1.5 h-1.5 rounded-full ${getStatus() === 'Online' || isTyping ? 'bg-emerald-400 animate-pulse' : 'bg-zinc-500'}`}></div>
-                                            <span className={`text-[10px] uppercase font-bold tracking-widest ${getStatus() === 'Online' || isTyping ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full ${getStatus() === 'Online' || isTyping ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                                            <span className={`text-[10px] uppercase font-bold tracking-widest ${getStatus() === 'Online' || isTyping ? 'text-emerald-600' : 'text-gray-400 dark:text-zinc-500'}`}>
                                                 {getStatus()}
                                             </span>
                                         </div>
@@ -572,12 +572,12 @@ const SingleChat = () => {
                                 </>
                             ) : (
                                 <>
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold text-lg border border-emerald-500/20">
+                                    <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-lg border border-emerald-200">
                                         {selectedChat.chatName[0]?.toUpperCase()}
                                     </div>
                                     <div className="flex flex-col text-left">
-                                        <span className="font-bold text-white tracking-tight">{selectedChat.chatName}</span>
-                                        <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500 mt-0.5">Community Channel</span>
+                                        <span className="font-bold text-gray-900 dark:text-white tracking-tight">{selectedChat.chatName}</span>
+                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-400 dark:text-zinc-500 mt-0.5">Community Channel</span>
                                     </div>
                                 </>
                             )}
@@ -588,7 +588,7 @@ const SingleChat = () => {
                                 onClick={() => setIsWhiteboardOpen(true)}
                                 disabled={uploadingFile}
                                 title="Live Collaborative Whiteboard"
-                                className="px-3 py-1.5 text-blue-400 hover:text-white transition-all bg-gradient-to-r from-blue-500/10 to-indigo-500/10 hover:from-blue-500/20 hover:to-indigo-500/20 rounded-xl border border-blue-500/20 hover:border-blue-400/50 hidden sm:flex items-center gap-2 group disabled:opacity-50"
+                                className="px-3 py-1.5 text-blue-600 hover:text-blue-700 transition-all bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 hover:border-blue-300 hidden sm:flex items-center gap-2 group disabled:opacity-50"
                             >
                                 <PenTool size={16} className="group-hover:-rotate-12 transition-transform" />
                                 <span className="text-[10px] font-bold uppercase tracking-widest hidden lg:inline">Live Whiteboard</span>
@@ -598,11 +598,11 @@ const SingleChat = () => {
                                     onClick={() => setIsCatchMeUpOpen(!isCatchMeUpOpen)}
                                     disabled={isSummarizing || messages.length === 0}
                                     title="Catch Me Up (AI Summary)"
-                                    className="px-3 py-1.5 text-emerald-300 hover:text-white transition-all bg-gradient-to-r from-emerald-500/20 to-teal-400/20 hover:from-emerald-500/30 hover:to-teal-400/30 rounded-xl border border-emerald-500/30 hover:border-emerald-400/60 hidden sm:flex items-center gap-2 group disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                                    className="px-3 py-1.5 text-emerald-600 hover:text-emerald-700 transition-all bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 hover:border-emerald-300 hidden sm:flex items-center gap-2 group disabled:opacity-50"
                                 >
-                                    {isSummarizing ? <Loader2 size={16} className="animate-spin text-emerald-200" /> : <Wand2 size={16} className="group-hover:rotate-12 transition-transform text-emerald-200" />}
-                                    <span className="text-[10px] font-black uppercase tracking-widest hidden lg:inline text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-teal-200">Catch Me Up</span>
-                                    <ChevronDown size={14} className="text-emerald-300 opacity-60 ml-1 group-hover:opacity-100" />
+                                    {isSummarizing ? <Loader2 size={16} className="animate-spin text-emerald-500" /> : <Wand2 size={16} className="group-hover:rotate-12 transition-transform text-emerald-500" />}
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden lg:inline text-emerald-600">Catch Me Up</span>
+                                    <ChevronDown size={14} className="text-emerald-500 opacity-60 ml-1 group-hover:opacity-100" />
                                 </button>
 
                                 <AnimatePresence>
@@ -613,19 +613,19 @@ const SingleChat = () => {
                                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-emerald-500/30 rounded-2xl shadow-2xl z-50 overflow-hidden"
+                                                className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0a0a0f] border border-emerald-200 rounded-2xl shadow-xl z-50 overflow-hidden"
                                             >
-                                                <div className="p-1 space-y-1 bg-gradient-to-br from-emerald-500/5 to-transparent">
+                                                <div className="p-1 space-y-1">
                                                     <button
                                                         onClick={() => handleCatchMeUp("unread")}
-                                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-zinc-300 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all text-left"
+                                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-gray-600 dark:text-zinc-300 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all text-left"
                                                     >
                                                         <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_10px_rgba(16,185,129,0.6)]"></span>
                                                         Summarize Unread
                                                     </button>
                                                     <button
                                                         onClick={() => handleCatchMeUp("today")}
-                                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-zinc-300 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all text-left"
+                                                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-gray-600 dark:text-zinc-300 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all text-left"
                                                     >
                                                         <span className="w-2 h-2 rounded-full border border-emerald-500 shrink-0"></span>
                                                         Summarize Today
@@ -642,12 +642,12 @@ const SingleChat = () => {
                                         initial={{ width: 0, opacity: 0 }}
                                         animate={{ width: 200, opacity: 1 }}
                                         exit={{ width: 0, opacity: 0 }}
-                                        className="relative overflow-hidden flex items-center bg-white/5 rounded-full px-4 border border-white/10"
+                                        className="relative overflow-hidden flex items-center bg-gray-50 dark:bg-[#0e0e13] rounded-full px-4 border border-gray-200 dark:border-white/5"
                                     >
-                                        <SearchIcon size={14} className="text-zinc-500" />
+                                        <SearchIcon size={14} className="text-gray-400 dark:text-zinc-500" />
                                         <input
                                             autoFocus
-                                            className="bg-transparent border-none outline-none text-xs text-white py-2 px-2 w-full placeholder:text-zinc-600 font-medium"
+                                            className="bg-transparent border-none outline-none text-xs text-gray-900 dark:text-white py-2 px-2 w-full placeholder:text-gray-400 dark:text-zinc-500 font-medium"
                                             placeholder="Search messages..."
                                             value={searchQuery}
                                             onChange={(e) => handleSearch(e.target.value)}
@@ -657,40 +657,40 @@ const SingleChat = () => {
                             </AnimatePresence>
                             <button
                                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                                className={`p-2.5 transition-colors rounded-xl border border-transparent ${isSearchOpen ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'text-zinc-500 hover:text-white hover:bg-white/5 hover:border-white/5'}`}
+                                className={`p-2.5 transition-colors rounded-xl border border-transparent ${isSearchOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 hover:bg-gray-50 dark:bg-[#0e0e13] dark:hover:bg-white/5 hover:border-gray-200 dark:border-white/5 dark:hover:border-white/10'}`}
                             >
                                 <SearchIcon size={20} />
                             </button>
                             <button
                                 onClick={() => selectedChat.isGroupChat ? setIsGroupOpen(true) : setIsProfileOpen(true)}
-                                className="p-2.5 text-zinc-500 hover:text-white transition-colors bg-white/0 hover:bg-white/5 rounded-xl border border-transparent hover:border-white/5"
+                                className="p-2.5 text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 transition-colors hover:bg-gray-50 dark:bg-[#0e0e13] dark:hover:bg-white/5 rounded-xl border border-transparent hover:border-gray-200 dark:border-white/5 dark:hover:border-white/10"
                             >
                                 <MoreVertical size={20} />
                             </button>
                         </div>
                     </div>
 
-                    <div className="flex-1 flex flex-col w-full overflow-hidden relative bg-black/10">
+                    <div className="flex-1 flex flex-col w-full overflow-hidden relative">
                         <AnimatePresence>
                             {chatSummary && (
                                 <motion.div
                                     initial={{ opacity: 0, y: -20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -20 }}
-                                    className="absolute top-4 inset-x-0 mx-auto w-[90%] max-w-2xl bg-zinc-900/95 backdrop-blur-xl border border-emerald-500/30 p-6 rounded-3xl z-40 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                                    className="absolute top-4 inset-x-0 mx-auto w-[90%] max-w-2xl bg-white dark:bg-[#0a0a0f] backdrop-blur-xl border border-emerald-200 p-6 rounded-3xl z-40 shadow-xl"
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-emerald-500/20 rounded-xl">
-                                                <Sparkles className="text-emerald-400" size={20} />
+                                            <div className="p-2 bg-emerald-50 rounded-xl">
+                                                <Sparkles className="text-emerald-500" size={20} />
                                             </div>
-                                            <h3 className="text-emerald-400 font-bold tracking-tight text-lg">AI Chat Summary</h3>
+                                            <h3 className="text-emerald-600 font-bold tracking-tight text-lg">AI Chat Summary</h3>
                                         </div>
-                                        <button onClick={() => setChatSummary(null)} className="text-zinc-500 hover:text-white transition-colors bg-white/5 p-2 rounded-full">
+                                        <button onClick={() => setChatSummary(null)} className="text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 transition-colors bg-gray-100 dark:bg-white/5 p-2 rounded-full">
                                             <X size={16} />
                                         </button>
                                     </div>
-                                    <div className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
+                                    <div className="text-gray-600 dark:text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
                                         {chatSummary}
                                     </div>
                                 </motion.div>
@@ -700,7 +700,7 @@ const SingleChat = () => {
                         {loading ? (
                             <div className="flex flex-col items-center justify-center h-full gap-4">
                                 <Loader2 className="animate-spin text-emerald-500/50" size={32} />
-                                <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-zinc-600">Loading messages</span>
+                                <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-gray-400 dark:text-zinc-500">Loading messages</span>
                             </div>
                         ) : (
                             <ScrollableChat
@@ -713,9 +713,9 @@ const SingleChat = () => {
                             />
                         )}
                         {searchResults && (
-                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-500/10 backdrop-blur-3xl border border-emerald-500/20 px-6 py-2.5 rounded-full z-30 flex items-center gap-4 shadow-[0_20px_50px_rgba(16,185,129,0.2)]">
-                                <div className="flex items-center gap-2 border-r border-emerald-500/20 pr-4">
-                                    <span className="text-[10px] uppercase font-black tracking-widest text-emerald-400">
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-emerald-50 backdrop-blur-sm border border-emerald-200 px-6 py-2.5 rounded-full z-30 flex items-center gap-4 shadow-md">
+                                <div className="flex items-center gap-2 border-r border-emerald-200 pr-4">
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-emerald-600">
                                         {searchResults.length > 0 ? `${activeSearchIndex + 1} of ${searchResults.length}` : "0 results"}
                                     </span>
                                 </div>
@@ -723,19 +723,19 @@ const SingleChat = () => {
                                     <button
                                         onClick={prevMatch}
                                         disabled={!searchResults || searchResults.length === 0}
-                                        className="p-1 text-emerald-500 hover:text-white hover:bg-emerald-500/20 rounded-md transition-all disabled:opacity-20"
+                                        className="p-1 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 rounded-md transition-all disabled:opacity-20"
                                     >
                                         <ChevronUp size={18} />
                                     </button>
                                     <button
                                         onClick={nextMatch}
                                         disabled={!searchResults || searchResults.length === 0}
-                                        className="p-1 text-emerald-500 hover:text-white hover:bg-emerald-500/20 rounded-md transition-all disabled:opacity-20"
+                                        className="p-1 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 rounded-md transition-all disabled:opacity-20"
                                     >
                                         <ChevronDown size={18} />
                                     </button>
                                 </div>
-                                <button onClick={() => { setSearchResults(null); setSearchQuery(""); setIsSearchOpen(false); setActiveSearchIndex(-1); }} className="text-zinc-500 hover:text-white ml-2">
+                                <button onClick={() => { setSearchResults(null); setSearchQuery(""); setIsSearchOpen(false); setActiveSearchIndex(-1); }} className="text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 ml-2">
                                     <X size={16} />
                                 </button>
                             </div>
@@ -756,15 +756,15 @@ const SingleChat = () => {
                                         {imagePreview ? (
                                             <img src={imagePreview} className="w-32 h-32 object-cover rounded-3xl border-2 border-emerald-500/50 relative z-10 shadow-[0_20px_50px_rgba(16,185,129,0.3)]" />
                                         ) : audioUrl ? (
-                                            <div className="bg-[#121217] rounded-3xl border-2 border-emerald-500/50 relative z-10 p-4 flex flex-col items-center gap-2 shadow-[0_20px_50px_rgba(16,185,129,0.3)] min-w-[120px]">
+                                            <div className="bg-white dark:bg-[#0a0a0f] rounded-3xl border-2 border-emerald-300 relative z-10 p-4 flex flex-col items-center gap-2 shadow-lg min-w-[120px]">
                                                 <Volume2 className="text-emerald-500 animate-pulse" size={32} />
-                                                <span className="text-[10px] text-white font-bold uppercase">{Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}</span>
-                                                <button onClick={cancelRecording} className="text-[8px] text-zinc-500 hover:text-red-400 font-black uppercase tracking-widest mt-1">Cancel Stream</button>
+                                                <span className="text-[10px] text-gray-700 dark:text-zinc-200 font-bold uppercase">{Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}</span>
+                                                <button onClick={cancelRecording} className="text-[8px] text-gray-400 dark:text-zinc-500 hover:text-red-500 font-black uppercase tracking-widest mt-1">Cancel Stream</button>
                                             </div>
                                         ) : (
-                                            <div className="w-32 h-32 bg-[#121217] rounded-3xl border-2 border-emerald-500/50 relative z-10 flex flex-col items-center justify-center p-4">
+                                            <div className="w-32 h-32 bg-white dark:bg-[#0a0a0f] rounded-3xl border-2 border-emerald-300 relative z-10 flex flex-col items-center justify-center p-4 shadow-lg">
                                                 <FileText className="text-emerald-500 mb-2" size={32} />
-                                                <p className="text-[8px] text-white truncate w-full text-center font-bold uppercase">{filePreview?.name}</p>
+                                                <p className="text-[8px] text-gray-700 dark:text-zinc-200 truncate w-full text-center font-bold uppercase">{filePreview?.name}</p>
                                             </div>
                                         )}
                                         {uploadingFile && (
@@ -784,14 +784,14 @@ const SingleChat = () => {
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
-                                        className="absolute inset-0 bg-emerald-500/20 backdrop-blur-3xl rounded-[2rem] z-50 flex items-center justify-between px-8 border border-emerald-500/30"
+                                        className="absolute inset-0 bg-emerald-50 backdrop-blur-sm rounded-[2rem] z-50 flex items-center justify-between px-8 border border-emerald-300"
                                     >
                                         <div className="flex items-center gap-4">
                                             <div className="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
-                                            <span className="text-sm font-bold text-white tracking-widest">RECORDING: {Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}</span>
+                                            <span className="text-sm font-bold text-gray-700 dark:text-zinc-200 tracking-widest">RECORDING: {Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}</span>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <button onClick={cancelRecording} className="text-zinc-400 hover:text-white text-xs font-bold uppercase tracking-widest">Discard</button>
+                                            <button onClick={cancelRecording} className="text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:text-zinc-200 dark:hover:text-zinc-200 text-xs font-bold uppercase tracking-widest">Discard</button>
                                             <button onClick={stopRecording} className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
                                                 <Square size={16} fill="white" />
                                             </button>
@@ -800,10 +800,10 @@ const SingleChat = () => {
                                 )}
                             </AnimatePresence>
 
-                            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-[2rem] blur opacity-0 group-focus-within/input:opacity-100 transition-opacity duration-500"></div>
-                            <div className="relative flex items-center gap-3 bg-zinc-900/80 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-2 pl-6 shadow-2xl">
+                            <div className="absolute -inset-px rounded-[2rem] opacity-0 group-focus-within/input:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, transparent 50%, rgba(6,182,212,0.06) 100%)' }}></div>
+                            <div className="relative flex items-center gap-2 bg-gray-50 dark:bg-[#0e0e13] border border-gray-200 dark:border-white/5 rounded-[2rem] p-2 pl-5 group-focus-within/input:border-emerald-300 transition-all">
                                 <button
-                                    className="text-zinc-500 hover:text-emerald-400 transition-colors p-2"
+                                    className="text-gray-400 dark:text-zinc-500 hover:text-emerald-500 transition-colors p-2"
                                     onClick={() => fileInputRef.current?.click()}
                                     title="Attach File"
                                     disabled={uploadingFile}
@@ -817,14 +817,14 @@ const SingleChat = () => {
                                     onChange={handleFileUpload}
                                 />
                                 <input
-                                    className="flex-1 bg-transparent border-none outline-none text-white text-sm py-3 placeholder:text-zinc-600 placeholder:font-medium selection:bg-emerald-500/30"
-                                    placeholder="Secure encryption enabled..."
+                                    className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white text-sm py-3 placeholder:text-gray-400 dark:text-zinc-500 placeholder:font-medium selection:bg-emerald-500/20"
+                                    placeholder="Type a message..."
                                     onKeyDown={sendMessage}
                                     value={newMessage}
                                     onChange={typingHandler}
                                 />
                                 <button
-                                    className={`p-2 transition-colors ${isRecording ? 'text-red-500' : 'text-zinc-600 hover:text-emerald-400'}`}
+                                    className={`p-2 transition-colors ${isRecording ? 'text-red-500' : 'text-gray-400 dark:text-zinc-500 hover:text-emerald-500'}`}
                                     onClick={startRecording}
                                     title="Voice Note"
                                 >
@@ -833,7 +833,7 @@ const SingleChat = () => {
                                 <button
                                     onClick={() => sendMessage({ type: "click" })}
                                     disabled={!newMessage.trim() && !audioUrl && !imagePreview && !filePreview}
-                                    className="p-3.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-[1.5rem] transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] disabled:opacity-50 disabled:shadow-none disabled:bg-zinc-800 disabled:text-zinc-600 active:scale-95"
+                                    className="p-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-[1.5rem] transition-all shadow-md disabled:opacity-50 disabled:shadow-none disabled:bg-gray-200 dark:bg-white/10 disabled:text-gray-400 dark:text-zinc-500 active:scale-95"
                                 >
                                     <Send size={18} />
                                 </button>
@@ -865,13 +865,13 @@ const SingleChat = () => {
                     )}
                 </>
             ) : (
-                <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-[#0d0d12]">
+                <div className="h-full flex flex-col items-center justify-center p-8 text-center">
                     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md">
-                        <div className="w-24 h-24 bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
+                        <div className="w-24 h-24 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 border border-emerald-200">
                             <Send size={40} className="text-emerald-500" />
                         </div>
-                        <h2 className="text-4xl font-bold text-white tracking-tighter mb-4">Select a Conversation</h2>
-                        <p className="text-zinc-500 font-medium leading-relaxed">
+                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white tracking-tighter mb-4">Select a Conversation</h2>
+                        <p className="text-gray-400 dark:text-zinc-500 font-medium leading-relaxed">
                             Select a chat to start messaging. <br />
                             Your conversations are secured with end-to-end encryption.
                         </p>
