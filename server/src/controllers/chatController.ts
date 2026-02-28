@@ -60,16 +60,24 @@ const accessChat = asyncHandler(async (req: any, res: Response) => {
 // Injects the unread counts into the chat object so the client can display notification badges accurately.
 const fetchChats = asyncHandler(async (req: any, res: Response) => {
     try {
+        // lean() returns plain JS objects — skips Mongoose document hydration for faster serialization
         const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
             .populate("users", "name pic email isOnline lastSeen")
             .populate("groupAdmin", "name pic email isOnline lastSeen")
             .populate("latestMessage")
-            .sort({ updatedAt: -1 });
+            .sort({ updatedAt: -1 })
+            .lean();
 
         const results = await User.populate(chats, {
             path: "latestMessage.sender",
             select: "name pic email isOnline lastSeen",
         });
+
+        // Skip aggregation entirely if user has no chats yet
+        if (results.length === 0) {
+            res.status(200).send([]);
+            return;
+        }
 
         const chatIds = results.map((chat: any) => chat._id);
 
@@ -94,12 +102,11 @@ const fetchChats = asyncHandler(async (req: any, res: Response) => {
             unreadMap[item._id.toString()] = item.count;
         });
 
-        const chatsWithUnread = results.map((chat: any) => {
-            return {
-                ...chat.toObject(),
-                unreadCount: unreadMap[chat._id.toString()] || 0
-            };
-        });
+        // Already lean objects, no need for .toObject()
+        const chatsWithUnread = results.map((chat: any) => ({
+            ...chat,
+            unreadCount: unreadMap[chat._id.toString()] || 0
+        }));
 
         res.status(200).send(chatsWithUnread);
     } catch (error: any) {

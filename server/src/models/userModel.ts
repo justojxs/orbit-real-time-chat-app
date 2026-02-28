@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Index for fast presence lookups (email index already created by unique: true)
+userSchema.index({ isOnline: 1 });
+
 userSchema.methods.matchPassword = async function (enteredPassword: string) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
@@ -37,7 +40,8 @@ userSchema.pre("save", async function (this: any) {
         return;
     }
 
-    const salt = await bcrypt.genSalt(10);
+    // Salt rounds 8 — still secure (2^8 iterations), but ~4x faster than 10
+    const salt = await bcrypt.genSalt(8);
     this.password = await bcrypt.hash(this.password, salt);
 });
 

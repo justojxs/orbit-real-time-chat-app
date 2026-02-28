@@ -63,6 +63,17 @@ app.get('/', (req, res) => {
     res.send('API is running...');
 });
 
+// Health check + warm-up endpoint — frontend pings this on page load to wake the server
+// Also warms the MongoDB connection pool by running a trivial query
+app.get('/health', async (req, res) => {
+    try {
+        await User.findOne().select('_id').lean().maxTimeMS(3000);
+        res.status(200).json({ status: 'ok', ts: Date.now() });
+    } catch {
+        res.status(200).json({ status: 'degraded', ts: Date.now() });
+    }
+});
+
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
@@ -91,21 +102,29 @@ io.on("connection", (socket) => {
             userSockets.set(userId, new Set());
         }
         const sessions = userSockets.get(userId);
-        const wasOffline = sessions?.size === 0; // Check if this is the first connection for this user
+        const wasOffline = sessions?.size === 0;
         sessions?.add(socket.id);
 
         try {
-            // Only update database and broadcast if this is the FIRST connection
+            // Run DB operations in parallel for faster socket setup
+            const dbOps: Promise<any>[] = [
+                // Always fetch online users for new connection
+                User.find({ isOnline: true }).select('_id').lean()
+            ];
+
+            // Only update presence if this is the first connection
             if (wasOffline) {
-                await User.findByIdAndUpdate(userId, { isOnline: true });
+                dbOps.push(User.findByIdAndUpdate(userId, { isOnline: true }));
+            }
+
+            const [onlineUsers] = await Promise.all(dbOps);
+
+            if (wasOffline) {
                 socket.broadcast.emit("user presence", { userId, isOnline: true });
             }
 
-            // Send current online users to the new user
-            const onlineUsers = await User.find({ isOnline: true }).select('_id');
-            const onlineUserIds = onlineUsers.map(u => u._id.toString());
+            const onlineUserIds = onlineUsers.map((u: any) => u._id.toString());
             socket.emit("online users list", onlineUserIds);
-
             socket.emit("connected");
         } catch (error) {
             console.error("Presence update error:", error);

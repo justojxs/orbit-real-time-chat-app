@@ -5,16 +5,29 @@ import Chat from "../models/chatModel";
 import { Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Fetches all messages for a specific chat room.
-// It populates the sender details, chat specific data, and user reaction details so the UI can have comprehensive data.
-// Rejects requests if an error occurs while fetching.
+// Fetches messages for a specific chat with cursor-based pagination.
+// Defaults to latest 50 messages. Client can send `before` (message ID) and `limit` to paginate older messages.
 const allMessages = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const messages = await Message.find({ chat: req.params.chatId })
-            .sort({ createdAt: 1 })
+        const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+        const before = req.query.before as string;
+
+        // Build query filter — if `before` cursor provided, fetch messages older than that
+        const filter: any = { chat: req.params.chatId };
+        if (before) {
+            filter._id = { $lt: before };
+        }
+
+        const messages = await Message.find(filter)
+            .sort({ createdAt: -1 }) // Fetch newest first
+            .limit(limit)
             .populate("sender", "name pic email isOnline lastSeen")
             .populate("chat")
-            .populate("reactions.user", "name pic");
+            .populate("reactions.user", "name pic")
+            .lean();
+
+        // Reverse to chronological order for display
+        messages.reverse();
         res.json(messages);
     } catch (error: any) {
         res.status(400);

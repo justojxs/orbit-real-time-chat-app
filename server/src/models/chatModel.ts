@@ -23,6 +23,9 @@ const chatSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Index for fast chat lookups by user (used in fetchChats — called on every page load)
+chatSchema.index({ users: 1, updatedAt: -1 });
+
 const Chat = mongoose.model("Chat", chatSchema);
 
 export default Chat;

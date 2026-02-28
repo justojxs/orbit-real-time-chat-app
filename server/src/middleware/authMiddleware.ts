@@ -23,7 +23,9 @@ const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
 
     try {
         const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
-        const user = await User.findById(decoded.id).select("-password");
+
+        // lean() returns a plain JS object — no Mongoose overhead (getters, change tracking, etc.)
+        const user = await User.findById(decoded.id).select("-password").lean();
 
         if (!user) {
             res.status(401).json({ message: "Not authorized, user not found" });

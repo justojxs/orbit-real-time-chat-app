@@ -47,9 +47,15 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         if (currentSocket) return;
 
         const newSocket = io(ENDPOINT, {
+            // Start with WebSocket directly — skip HTTP long-polling negotiation (saves 2-3s)
+            transports: ["websocket"],
+            // Upgrade is unnecessary since we start with websocket
+            upgrade: false,
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 1000,
+            // Prevent duplicate sockets on HMR
+            forceNew: false,
         });
 
         newSocket.emit("setup", userInfo);

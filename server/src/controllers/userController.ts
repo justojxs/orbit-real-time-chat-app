@@ -21,7 +21,11 @@ const allUsers = asyncHandler(async (req: any, res: Response) => {
         }
         : {};
 
-    const users = await User.find(keyword).find({ _id: { $ne: req.user?._id } });
+    // lean() + limit for fast search — no need to hydrate full Mongoose docs
+    const users = await User.find({ ...keyword, _id: { $ne: req.user?._id } })
+        .select("name email pic isOnline lastSeen")
+        .limit(15)
+        .lean();
     res.send(users);
 });
 
@@ -73,7 +77,7 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
 
     let user: any = await User.findOne({ email });
 
-    // Auto-create guest user if not found
+    // Auto-create guest user if not found — optimized to run dummy user seeding in background
     if (!user && email === 'guest@example.com' && password === '123456') {
         user = await User.create({
             name: 'Guest User',
@@ -82,21 +86,35 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
             pic: 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg',
         });
 
-        // Create some dummy users for the guest to chat with
+        // Fire-and-forget: seed dummy users in background so the guest login returns FAST
+        const defaultPic = 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg';
         const dummyUsers = [
-            { name: "John Doe", email: "john@example.com", password: "password", pic: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg" },
-            { name: "Jane Smith", email: "jane@example.com", password: "password", pic: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg" },
-            { name: "Alice Johnson", email: "alice@example.com", password: "password", pic: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg" },
-            { name: "Bob Brown", email: "bob@example.com", password: "password", pic: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg" },
-            { name: "Charlie Davis", email: "charlie@example.com", password: "password", pic: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg" },
+            { name: "John Doe", email: "john@example.com", password: "password", pic: defaultPic },
+            { name: "Jane Smith", email: "jane@example.com", password: "password", pic: defaultPic },
+            { name: "Alice Johnson", email: "alice@example.com", password: "password", pic: defaultPic },
+            { name: "Bob Brown", email: "bob@example.com", password: "password", pic: defaultPic },
+            { name: "Charlie Davis", email: "charlie@example.com", password: "password", pic: defaultPic },
         ];
 
-        for (const dummy of dummyUsers) {
-            const exists = await User.findOne({ email: dummy.email });
-            if (!exists) {
-                await User.create(dummy);
+        // Non-blocking: create all dummy users in parallel using insertMany with ordered:false
+        // This does NOT block the login response
+        (async () => {
+            try {
+                const bcrypt = await import('bcryptjs');
+                const salt = await bcrypt.genSalt(8);
+                const hashedDummies = await Promise.all(
+                    dummyUsers.map(async (d) => ({
+                        ...d,
+                        password: await bcrypt.hash(d.password, salt),
+                    }))
+                );
+                // ordered: false means it won't stop on duplicate key errors
+                await User.insertMany(hashedDummies, { ordered: false });
+            } catch (err: any) {
+                // Ignore duplicate key errors (E11000) — users already exist
+                if (err.code !== 11000) console.error('Dummy user seeding error:', err);
             }
-        }
+        })();
     }
 
     if (user && (await user.matchPassword(password))) {
@@ -105,8 +123,8 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
         // Set Refresh Token Cookie
         res.cookie('jwt', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development', // Use secure cookies in production
-            sameSite: process.env.NODE_ENV === 'development' ? 'strict' : 'none', // 'none' required for cross-origin (Vercel→Render)
+            secure: process.env.NODE_ENV !== 'development',
+            sameSite: process.env.NODE_ENV === 'development' ? 'strict' : 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 

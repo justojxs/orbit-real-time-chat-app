@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import Login from "../components/Authentication/Login";
-import Signup from "../components/Authentication/Signup";
+const Signup = lazy(() => import("../components/Authentication/Signup"));
 import { motion, AnimatePresence } from "framer-motion";
 
 const HomePage = () => {
@@ -61,7 +61,11 @@ const HomePage = () => {
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            {type === "login" ? <Login /> : <Signup />}
+                            {type === "login" ? <Login /> : (
+                                <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>}>
+                                    <Signup />
+                                </Suspense>
+                            )}
                         </motion.div>
                     </AnimatePresence>
                 </div>
