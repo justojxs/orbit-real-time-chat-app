@@ -113,7 +113,7 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
             const systemPrompt = "Your name is Orbit AI. You are the official AI assistant for the Orbit Chat application. You are helpful, professional, and slightly futuristic in your tone. You should answer questions clearly and can help with anything from coding to general knowledge. Keep responses concise.";
 
             // Retry logic with exponential backoff and model fallback
-            const models = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+            const models = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"];
             const MAX_RETRIES = 3;
             let lastError: any = null;
 
