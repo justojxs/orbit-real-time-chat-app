@@ -23,13 +23,13 @@ const accessChat = asyncHandler(async (req: any, res: Response) => {
             { users: { $elemMatch: { $eq: userId } } },
         ],
     })
-        .populate("users", "name pic email isOnline lastSeen")
+        .populate("users", "name pic email isOnline lastSeen isVerified")
         .populate("latestMessage");
 
     // @ts-ignore
     isChat = await User.populate(isChat, {
         path: "latestMessage.sender",
-        select: "name pic email isOnline lastSeen",
+        select: "name pic email isOnline lastSeen isVerified",
     });
 
     if (isChat.length > 0) {
@@ -45,7 +45,7 @@ const accessChat = asyncHandler(async (req: any, res: Response) => {
             const createdChat = await Chat.create(chatData);
             const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
                 "users",
-                "-password"
+                "name pic email isOnline lastSeen isVerified"
             );
             res.status(200).json(FullChat);
         } catch (error: any) {
@@ -62,15 +62,15 @@ const fetchChats = asyncHandler(async (req: any, res: Response) => {
     try {
         // lean() returns plain JS objects — skips Mongoose document hydration for faster serialization
         const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-            .populate("users", "name pic email isOnline lastSeen")
-            .populate("groupAdmin", "name pic email isOnline lastSeen")
+            .populate("users", "name pic email isOnline lastSeen isVerified")
+            .populate("groupAdmin", "name pic email isOnline lastSeen isVerified")
             .populate("latestMessage")
             .sort({ updatedAt: -1 })
             .lean();
 
         const results = await User.populate(chats, {
             path: "latestMessage.sender",
-            select: "name pic email isOnline lastSeen",
+            select: "name pic email isOnline lastSeen isVerified",
         });
 
         // Skip aggregation entirely if user has no chats yet
@@ -168,8 +168,8 @@ const createGroupChat = asyncHandler(async (req: any, res: Response) => {
         });
 
         const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
-            .populate("users", "name pic email isOnline lastSeen")
-            .populate("groupAdmin", "name pic email isOnline lastSeen");
+            .populate("users", "name pic email isOnline lastSeen isVerified")
+            .populate("groupAdmin", "name pic email isOnline lastSeen isVerified");
 
         res.status(200).json(fullGroupChat);
     } catch (error: any) {
@@ -192,8 +192,8 @@ const renameGroup = asyncHandler(async (req: Request, res: Response) => {
             new: true,
         }
     )
-        .populate("users", "name pic email isOnline lastSeen")
-        .populate("groupAdmin", "name pic email isOnline lastSeen");
+        .populate("users", "name pic email isOnline lastSeen isVerified")
+        .populate("groupAdmin", "name pic email isOnline lastSeen isVerified");
 
     if (!updatedChat) {
         res.status(404);
@@ -218,8 +218,8 @@ const removeFromGroup = asyncHandler(async (req: any, res: Response) => {
             new: true,
         }
     )
-        .populate("users", "name pic email isOnline lastSeen")
-        .populate("groupAdmin", "name pic email isOnline lastSeen");
+        .populate("users", "name pic email isOnline lastSeen isVerified")
+        .populate("groupAdmin", "name pic email isOnline lastSeen isVerified");
 
     if (!removed) {
         res.status(404);
@@ -245,7 +245,7 @@ const removeFromGroup = asyncHandler(async (req: any, res: Response) => {
                 .populate("chat")
                 .populate({
                     path: "chat.users",
-                    select: "name pic email isOnline lastSeen",
+                    select: "name pic email isOnline lastSeen isVerified",
                 });
 
             await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
@@ -273,8 +273,8 @@ const addToGroup = asyncHandler(async (req: any, res: Response) => {
             new: true,
         }
     )
-        .populate("users", "name pic email isOnline lastSeen")
-        .populate("groupAdmin", "name pic email isOnline lastSeen");
+        .populate("users", "name pic email isOnline lastSeen isVerified")
+        .populate("groupAdmin", "name pic email isOnline lastSeen isVerified");
 
     if (!added) {
         res.status(404);
@@ -297,7 +297,7 @@ const addToGroup = asyncHandler(async (req: any, res: Response) => {
                 .populate("chat")
                 .populate({
                     path: "chat.users",
-                    select: "name pic email isOnline lastSeen",
+                    select: "name pic email isOnline lastSeen isVerified",
                 });
 
             await Chat.findByIdAndUpdate(chatId, { latestMessage: message });

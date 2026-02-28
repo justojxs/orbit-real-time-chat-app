@@ -23,7 +23,7 @@ const allUsers = asyncHandler(async (req: any, res: Response) => {
 
     // lean() + limit for fast search — no need to hydrate full Mongoose docs
     const users = await User.find({ ...keyword, _id: { $ne: req.user?._id } })
-        .select("name email pic isOnline lastSeen")
+        .select("name email pic isOnline lastSeen isVerified")
         .limit(15)
         .lean();
     res.send(users);

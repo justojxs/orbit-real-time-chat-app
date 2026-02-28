@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../lib/axios";
 import { useChatStore } from "../store/useChatStore";
-import { Plus, Pin } from "lucide-react";
+import { Plus, Pin, BadgeCheck } from "lucide-react";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -135,10 +135,13 @@ const MyChats = () => {
 
                                         <div className="flex flex-col flex-1 overflow-hidden ml-1">
                                             <div className="flex justify-between items-center w-full">
-                                                <h3 className="font-semibold text-[15px] text-white truncate max-w-[70%]">
+                                                <h3 className="font-semibold text-[15px] text-white truncate max-w-[70%] flex items-center gap-1.5">
                                                     {!chat.isGroupChat
                                                         ? getSender(chat.users)
                                                         : chat.chatName}
+                                                    {!chat.isGroupChat && (getSenderFull(chat.users) as any).isVerified && (
+                                                        <BadgeCheck size={14} className="text-emerald-500 fill-emerald-500/10 shrink-0" />
+                                                    )}
                                                 </h3>
                                                 <div className="flex items-center gap-2">
                                                     {isPinned && <Pin size={12} className="text-emerald-500 fill-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />}

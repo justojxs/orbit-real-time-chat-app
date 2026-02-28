@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import api from "../lib/axios";
 import ScrollableChat from "./ScrollableChat";
-import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown, Sparkles, Wand2, PenTool } from "lucide-react";
+import { Send, ArrowLeft, Loader2, Info, MoreVertical, Paperclip, FileText, Mic, X, Search as SearchIcon, Volume2, Square, ChevronUp, ChevronDown, Sparkles, Wand2, PenTool, BadgeCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModal from "./miscellaneous/ProfileModal";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
@@ -552,6 +552,9 @@ const SingleChat = () => {
                                     <div className="flex flex-col">
                                         <div className="flex items-center gap-2">
                                             <span className="font-bold text-white tracking-tight">{getSender(user, selectedChat.users)}</span>
+                                            {getSenderFull(user, selectedChat.users).isVerified && (
+                                                <BadgeCheck size={16} className="text-emerald-500 fill-emerald-500/10" />
+                                            )}
                                             <button
                                                 onClick={() => setIsProfileOpen(true)}
                                                 className="p-1 text-zinc-600 hover:text-emerald-500 transition-colors bg-white/5 hover:bg-emerald-500/10 rounded-lg outline-none"

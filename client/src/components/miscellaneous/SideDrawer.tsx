@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useChatStore } from "../../store/useChatStore";
 import { useNavigate } from "react-router-dom";
 import api from "../../lib/axios";
-import { Search, Bell, ChevronDown, X, LogOut, User as UserIcon, Loader2 } from "lucide-react";
+import { Search, Bell, ChevronDown, X, LogOut, User as UserIcon, Loader2, BadgeCheck } from "lucide-react";
 import ProfileModal from "./ProfileModal";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -264,7 +264,10 @@ const SideDrawer = () => {
                                         >
                                             <img src={user.pic} alt={user.name} className="w-12 h-12 rounded-full object-cover border border-white/10 group-hover:border-emerald-500/30 transition-colors" />
                                             <div className="flex-1 overflow-hidden">
-                                                <h4 className="text-sm font-bold text-zinc-100 truncate group-hover:text-emerald-400 transition-colors">{user.name}</h4>
+                                                <div className="flex items-center gap-1.5">
+                                                    <h4 className="text-sm font-bold text-zinc-100 truncate group-hover:text-emerald-400 transition-colors">{user.name}</h4>
+                                                    {user.isVerified && <BadgeCheck size={14} className="text-emerald-500 fill-emerald-500/10 shrink-0" />}
+                                                </div>
                                                 <p className="text-[11px] text-zinc-500 font-medium truncate uppercase tracking-tighter">{user.email}</p>
                                             </div>
                                         </div>

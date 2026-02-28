@@ -16,6 +16,9 @@ import Message from './models/messageModel';
 import User from './models/userModel';
 import compression from 'compression';
 
+import { handleAIResponse } from './utils/aiService';
+import Chat from './models/chatModel';
+
 dotenv.config();
 
 const app: Express = express();
@@ -41,7 +44,28 @@ if (process.env.REDIS_URL) {
     console.log("No REDIS_URL set — running Socket.io without Redis adapter (single instance mode)");
 }
 
-connectDB();
+connectDB().then(async () => {
+    // Ensure Orbit AI user exists for the new AI feature
+    try {
+        const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
+        if (!orbitAI) {
+            await User.create({
+                name: "Orbit AI",
+                email: "orbit-ai@orbit.app",
+                password: "orbit-ai-system-password-dont-use",
+                pic: "https://res.cloudinary.com/dtga8lwj3/image/upload/v1740738600/orbit_ai_logo.png",
+                isAdmin: true,
+                isOnline: true, // Orbit AI is always online
+                isVerified: true,
+            });
+            console.log("Orbit AI User Initialized Successfully");
+        } else if (!orbitAI.isOnline) {
+            await User.findByIdAndUpdate(orbitAI._id, { isOnline: true });
+        }
+    } catch (error) {
+        console.error("Failed to initialize Orbit AI:", error);
+    }
+});
 
 app.use(compression());
 app.use(express.json());
@@ -154,6 +178,12 @@ io.on("connection", (socket) => {
             if (user._id == newMessageRecieved.sender._id) return;
             socket.in(user._id).emit("message recieved", newMessageRecieved);
         });
+
+        // Check if message is intended for Orbit AI
+        const orbitAI = chat.users.find((u: any) => u.email === "orbit-ai@orbit.app");
+        if (orbitAI && newMessageRecieved.sender._id !== orbitAI._id.toString()) {
+            handleAIResponse(newMessageRecieved, io);
+        }
     });
 
     // New: Read Receipt Event
