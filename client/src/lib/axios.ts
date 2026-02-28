@@ -5,7 +5,6 @@ const API_URL = import.meta.env.VITE_API_URL || "";
 const api = axios.create({
     baseURL: API_URL,
     withCredentials: true, // Send cookies cross-origin (needed for refresh tokens)
-    timeout: 15000, // 15s timeout — fail fast instead of hanging forever
 });
 
 // Response interceptor: auto-refresh expired tokens without user intervention

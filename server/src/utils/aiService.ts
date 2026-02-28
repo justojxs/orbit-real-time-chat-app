@@ -50,6 +50,14 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
     // Emit typing indicator immediately
     emitToUsers("typing", chatId);
 
+    // Immediately mark the incoming message as read by Orbit AI
+    try {
+        await Message.findByIdAndUpdate(newMessage._id, { $addToSet: { readBy: orbitAI._id } });
+        emitToUsers("message read", { chatId: chatId, userId: orbitAI._id });
+    } catch (err) {
+        console.error("Orbit AI: Failed to mark message as read:", err);
+    }
+
     try {
         const apiKey = process.env.GEMINI_API_KEY;
         let aiResponseText = "";
@@ -87,8 +95,19 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
                 if (cleanHistory.length > 0 && cleanHistory[cleanHistory.length - 1].role === entry.role) {
                     cleanHistory[cleanHistory.length - 1].parts[0].text += "\n" + entry.parts[0].text;
                 } else {
-                    cleanHistory.push(entry);
+                    cleanHistory.push({ role: entry.role, parts: [{ text: entry.parts[0].text }] });
                 }
+            }
+
+            // Ensure cleanHistory starts with "user" to maintain alternation with the prefix (User -> Model)
+            if (cleanHistory.length > 0 && cleanHistory[0].role === "model") {
+                cleanHistory.shift(); // Drop the model message so we start with user
+            }
+
+            // Ensure cleanHistory ends with "model" because the next action is a User sendMessage(content)
+            if (cleanHistory.length > 0 && cleanHistory[cleanHistory.length - 1].role === "user") {
+                // Append a dummy model acknowledgement to satisfy the Gemini constraint
+                cleanHistory.push({ role: "model", parts: [{ text: "Acknowledged." }] });
             }
 
             const systemPrompt = "Your name is Orbit AI. You are the official AI assistant for the Orbit Chat application. You are helpful, professional, and slightly futuristic in your tone. You should answer questions clearly and can help with anything from coding to general knowledge. Keep responses concise.";

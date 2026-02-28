@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, Loader2, User as UserIcon } from "lucide-react";
+import { Mail, Lock, Loader2, User as UserIcon, Info } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -68,6 +68,12 @@ const Login = () => {
 
     return (
         <div className="space-y-6 animate-scale-in">
+            <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl p-4 flex gap-3 text-emerald-800 dark:text-emerald-200">
+                <Info className="flex-shrink-0 text-emerald-500 mt-0.5" size={18} />
+                <div className="text-xs leading-relaxed font-medium">
+                    <span className="font-bold">Demo Tester Note:</span> The backend is currently deployed on a free Render instance. Please be patient—it may take <span className="font-bold underline decoration-emerald-500/30 underline-offset-2">20-25 seconds</span> to wake up from a cold start during your initial login attempt!
+                </div>
+            </div>
             <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-zinc-500 ml-1">Email Address</label>
                 <div className="relative group">
