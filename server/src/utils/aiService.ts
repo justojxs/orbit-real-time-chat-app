@@ -75,12 +75,15 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
         // 4. Update latest message in chat
         await Chat.findByIdAndUpdate(chat._id, { latestMessage: aiMessage });
 
-        // 5. Emit the AI response to the room
-        io.in(chat._id).emit("stop typing", chat._id);
-        io.in(chat._id).emit("message recieved", aiMessage);
+        // 5. Emit the AI response to each user in the chat individually (following index.ts pattern)
+        chat.users.forEach((u: any) => {
+            const roomid = u._id?.toString() || u.toString();
+            // Stop typing and send message to each participant's personal room
+            io.in(roomid).emit("stop typing", chat._id.toString());
+            io.in(roomid).emit("message recieved", aiMessage);
+        });
 
     } catch (error) {
         console.error("Orbit AI Error:", error);
-        io.in(chat._id).emit("stop typing", chat._id);
     }
 };

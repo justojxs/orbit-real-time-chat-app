@@ -48,22 +48,25 @@ connectDB().then(async () => {
     // Ensure Orbit AI user exists for the new AI feature
     try {
         const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
+        const aiAvatar = "https://api.dicebear.com/9.x/bottts-neutral/svg?seed=OrbitAI&backgroundColor=b6e3f4,c0aede,d1d4f9";
+
         if (!orbitAI) {
             await User.create({
                 name: "Orbit AI",
                 email: "orbit-ai@orbit.app",
                 password: "orbit-ai-system-password-dont-use",
-                pic: "https://res.cloudinary.com/dtga8lwj3/image/upload/v1740738600/orbit_ai_logo.png",
+                pic: aiAvatar,
                 isAdmin: true,
-                isOnline: true, // Orbit AI is always online
+                isOnline: true,
                 isVerified: true,
             });
-            console.log("Orbit AI User Initialized Successfully");
-        } else if (!orbitAI.isOnline) {
-            await User.findByIdAndUpdate(orbitAI._id, { isOnline: true });
+            console.log("Orbit AI Initialized");
+        } else {
+            // Update image and status to ensure it's always correct
+            await User.updateOne({ email: "orbit-ai@orbit.app" }, { pic: aiAvatar, isOnline: true, isVerified: true });
         }
     } catch (error) {
-        console.error("Failed to initialize Orbit AI:", error);
+        console.error("Orbit AI Init Error:", error);
     }
 });
 
@@ -181,7 +184,7 @@ io.on("connection", (socket) => {
 
         // Check if message is intended for Orbit AI
         const orbitAI = chat.users.find((u: any) => u.email === "orbit-ai@orbit.app");
-        if (orbitAI && newMessageRecieved.sender._id !== orbitAI._id.toString()) {
+        if (orbitAI && newMessageRecieved.sender._id.toString() !== orbitAI._id.toString()) {
             handleAIResponse(newMessageRecieved, io);
         }
     });

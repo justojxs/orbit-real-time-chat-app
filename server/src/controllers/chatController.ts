@@ -58,7 +58,7 @@ const accessChat = asyncHandler(async (req: any, res: Response) => {
 // Looks up every chat room (One-to-One and Group) that the requester is a participant of.
 // Aggregates unread message counts for each chat using a specialized MongoDB aggregation pipeline.
 // Injects the unread counts into the chat object so the client can display notification badges accurately.
-const fetchChats = asyncHandler(async (req: any, res: Response) => {
+const fetchChats: any = asyncHandler(async (req: any, res: Response): Promise<void> => {
     try {
         // lean() returns plain JS objects — skips Mongoose document hydration for faster serialization
         const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
@@ -107,6 +107,36 @@ const fetchChats = asyncHandler(async (req: any, res: Response) => {
             ...chat,
             unreadCount: unreadMap[chat._id.toString()] || 0
         }));
+
+        // Ensure Orbit AI chat exists for this user in their list by default
+        const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
+        if (orbitAI) {
+            const hasOrbitChat = results.some((chat: any) =>
+                !chat.isGroupChat && chat.users.some((u: any) => u.email === "orbit-ai@orbit.app")
+            );
+
+            if (!hasOrbitChat) {
+                // Background ensure: Create the chat document if it doesn't exist
+                let newOrbitChat: any = await Chat.findOne({
+                    isGroupChat: false,
+                    $and: [
+                        { users: { $elemMatch: { $eq: req.user._id } } },
+                        { users: { $elemMatch: { $eq: orbitAI._id } } },
+                    ],
+                });
+
+                if (!newOrbitChat) {
+                    newOrbitChat = await Chat.create({
+                        chatName: "Orbit AI",
+                        isGroupChat: false,
+                        users: [req.user._id, orbitAI._id],
+                    });
+                }
+
+                // Return fresh list for new user/connection
+                return fetchChats(req, res);
+            }
+        }
 
         res.status(200).send(chatsWithUnread);
     } catch (error: any) {
