@@ -5,50 +5,75 @@ import User from "../models/userModel";
 
 export const handleAIResponse = async (newMessage: any, io: any) => {
     const { chat, content, sender } = newMessage;
+    const chatId = chat._id?.toString() || chat.toString();
 
     if (!chat || !content) return;
 
     try {
         // 1. Find Orbit AI user
         const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
-        if (!orbitAI) return;
+        if (!orbitAI) {
+            console.error("Orbit AI user not found in database");
+            return;
+        }
 
-        // 2. Add 'typing' indicator from AI
-        io.in(chat._id).emit("typing", chat._id);
+        // 2. Add 'typing' indicator — emit to each user's personal room
+        chat.users.forEach((u: any) => {
+            const uid = u._id?.toString() || u.toString();
+            io.in(uid).emit("typing", chatId);
+        });
 
         const apiKey = process.env.GEMINI_API_KEY;
         let aiResponseText = "";
 
         if (!apiKey) {
             // Mock response if no API key
-            await new Promise(r => setTimeout(r, 2000));
+            await new Promise(r => setTimeout(r, 1500));
             aiResponseText = "I'm Orbit AI! The GEMINI_API_KEY is not configured on the server, so I'm running in mock mode. How can I help you today?";
         } else {
             const genAI = new GoogleGenerativeAI(apiKey);
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-            // Fetch recent context for the AI
-            const history = await Message.find({ chat: chat._id })
+            // Fetch recent context for the AI — exclude the current message as it will be sent via sendMessage
+            const history = await Message.find({
+                chat: chatId,
+                _id: { $ne: newMessage._id }
+            })
                 .sort({ createdAt: -1 })
                 .limit(10)
-                .populate("sender", "name")
+                .populate("sender", "name email")
                 .lean();
 
             history.reverse();
 
-            const chatHistory = history.map((m: any) => ({
-                role: m.sender.email === "orbit-ai@orbit.app" ? "model" : "user",
-                parts: [{ text: m.content }],
-            }));
+            // Build chat history, ensuring alternating user/model roles
+            // Gemini requires strict alternation: user, model, user, model...
+            const rawHistory = history
+                .filter((m: any) => m.content && m.sender)
+                .map((m: any) => ({
+                    role: m.sender.email === "orbit-ai@orbit.app" ? "model" : "user",
+                    parts: [{ text: m.content }],
+                }));
+
+            // Collapse consecutive same-role entries (Gemini will reject otherwise)
+            const cleanHistory: { role: string; parts: { text: string }[] }[] = [];
+            for (const entry of rawHistory) {
+                if (cleanHistory.length > 0 && cleanHistory[cleanHistory.length - 1].role === entry.role) {
+                    // Merge into previous entry
+                    cleanHistory[cleanHistory.length - 1].parts[0].text += "\n" + entry.parts[0].text;
+                } else {
+                    cleanHistory.push(entry);
+                }
+            }
 
             // Identity prompt
-            const systemPrompt = "Your name is Orbit AI. You are the official AI assistant for the Orbit Chat application. You are helpful, professional, and slightly futuristic in your tone. You should answer questions clearly and can help with anything from coding to general knowledge.";
+            const systemPrompt = "Your name is Orbit AI. You are the official AI assistant for the Orbit Chat application. You are helpful, professional, and slightly futuristic in your tone. You should answer questions clearly and can help with anything from coding to general knowledge. Keep responses concise.";
 
             const chatSession = model.startChat({
                 history: [
                     { role: "user", parts: [{ text: `System Instruction: ${systemPrompt}` }] },
-                    { role: "model", parts: [{ text: "Understood. I am Orbit AI, your cosmic chat assistant. How can I assist you in the Orbit network today?" }] },
-                    ...chatHistory.slice(0, -1) // All except the very latest message which we'll send as current
+                    { role: "model", parts: [{ text: "Understood. I am Orbit AI. How can I assist you today?" }] },
+                    ...cleanHistory,
                 ],
             });
 
@@ -61,7 +86,7 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
         let aiMessage: any = await Message.create({
             sender: orbitAI._id,
             content: aiResponseText,
-            chat: chat._id,
+            chat: chatId,
             readBy: [orbitAI._id],
         });
 
@@ -73,17 +98,23 @@ export const handleAIResponse = async (newMessage: any, io: any) => {
         });
 
         // 4. Update latest message in chat
-        await Chat.findByIdAndUpdate(chat._id, { latestMessage: aiMessage });
+        await Chat.findByIdAndUpdate(chatId, { latestMessage: aiMessage });
 
-        // 5. Emit the AI response to each user in the chat individually (following index.ts pattern)
+        // 5. Emit the AI response to each user's personal room (matching index.ts pattern)
         chat.users.forEach((u: any) => {
-            const roomid = u._id?.toString() || u.toString();
-            // Stop typing and send message to each participant's personal room
-            io.in(roomid).emit("stop typing", chat._id.toString());
-            io.in(roomid).emit("message recieved", aiMessage);
+            const uid = u._id?.toString() || u.toString();
+            io.in(uid).emit("stop typing", chatId);
+            io.in(uid).emit("message recieved", aiMessage);
         });
 
     } catch (error) {
         console.error("Orbit AI Error:", error);
+        // Stop typing indicator on error
+        try {
+            chat.users.forEach((u: any) => {
+                const uid = u._id?.toString() || u.toString();
+                io.in(uid).emit("stop typing", chat._id?.toString() || chat.toString());
+            });
+        } catch (_) { }
     }
 };

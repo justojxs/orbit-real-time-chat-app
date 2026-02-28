@@ -48,7 +48,7 @@ connectDB().then(async () => {
     // Ensure Orbit AI user exists for the new AI feature
     try {
         const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
-        const aiAvatar = "https://api.dicebear.com/9.x/bottts-neutral/svg?seed=OrbitAI&backgroundColor=b6e3f4,c0aede,d1d4f9";
+        const aiAvatar = "https://res.cloudinary.com/dtga8lwj3/image/upload/v1772301117/bbzatm74zenqqve4kmkk.png";
 
         if (!orbitAI) {
             await User.create({
@@ -169,8 +169,8 @@ io.on("connection", (socket) => {
         // await Message.updateMany({ chat: room }, { $addToSet: { readBy: socket.id } }); // This needs user ID from session context usually
     });
 
-    socket.on("typing", (room) => socket.in(room).emit("typing"));
-    socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+    socket.on("typing", (room) => socket.in(room).emit("typing", room));
+    socket.on("stop typing", (room) => socket.in(room).emit("stop typing", room));
 
     socket.on("new message", (newMessageRecieved) => {
         var chat = newMessageRecieved.chat;

@@ -102,24 +102,9 @@ const HomePage = () => {
             <div className="relative z-10 w-full">
                 {/* Hero Section */}
                 <section className="h-screen w-full flex flex-col items-center justify-center px-6 relative overflow-hidden">
-                    {/* Floating Ambient Elements */}
-                    <motion.div
-                        animate={{
-                            y: [0, -20, 0],
-                            x: [0, 10, 0],
-                            rotate: [0, 5, 0]
-                        }}
-                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute top-1/4 -left-20 w-96 h-96 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none"
-                    />
-                    <motion.div
-                        animate={{
-                            y: [0, 30, 0],
-                            x: [0, -15, 0],
-                        }}
-                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                        className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-teal-500/5 blur-[140px] rounded-full pointer-events-none"
-                    />
+                    {/* Lightweight Static Ambient Glow */}
+                    <div className="absolute top-1/4 -left-20 w-96 h-96 bg-emerald-500/[0.04] rounded-full pointer-events-none" style={{ filter: 'blur(80px)' }} />
+                    <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-teal-500/[0.03] rounded-full pointer-events-none" style={{ filter: 'blur(80px)' }} />
 
                     <div className="max-w-4xl w-full flex flex-col items-center relative z-10">
                         <motion.div
@@ -196,22 +181,17 @@ const HomePage = () => {
                         </motion.div>
                     </div>
 
-                    {/* Infinite Scroll Hint */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 0.3 }}
-                        transition={{ delay: 1.5, duration: 1 }}
-                        className="absolute bottom-12 flex flex-col items-center gap-3"
-                    >
+                    {/* Optimized Scroll Hint */}
+                    <div className="absolute bottom-12 flex flex-col items-center gap-3 opacity-30 select-none">
                         <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-zinc-500">Scroll Down</span>
                         <div className="w-1 h-12 rounded-full overflow-hidden bg-white/10 relative">
                             <motion.div
-                                animate={{ y: [0, 48, 0] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="absolute top-0 w-full h-1/3 bg-emerald-500"
+                                animate={{ translateY: [0, 32, 0] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute top-0 w-full h-1/3 bg-emerald-500 rounded-full"
                             />
                         </div>
-                    </motion.div>
+                    </div>
                 </section>
 
                 {/* Auth Section */}

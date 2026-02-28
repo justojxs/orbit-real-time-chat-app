@@ -73,7 +73,37 @@ const fetchChats: any = asyncHandler(async (req: any, res: Response): Promise<vo
             select: "name pic email isOnline lastSeen isVerified",
         });
 
-        // Skip aggregation entirely if user has no chats yet
+        // Ensure Orbit AI chat exists for this user in their list by default
+        const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
+        if (orbitAI) {
+            const hasOrbitChat = results.some((chat: any) =>
+                !chat.isGroupChat && chat.users.some((u: any) => u.email === "orbit-ai@orbit.app")
+            );
+
+            if (!hasOrbitChat) {
+                // Background ensure: Create the chat document if it doesn't exist
+                let newOrbitChat: any = await Chat.findOne({
+                    isGroupChat: false,
+                    $and: [
+                        { users: { $elemMatch: { $eq: req.user._id } } },
+                        { users: { $elemMatch: { $eq: orbitAI._id } } },
+                    ],
+                });
+
+                if (!newOrbitChat) {
+                    await Chat.create({
+                        chatName: "Orbit AI",
+                        isGroupChat: false,
+                        users: [req.user._id, orbitAI._id],
+                    });
+                }
+
+                // Recursively fetch to get the newly created chat in the results
+                return fetchChats(req, res);
+            }
+        }
+
+        // Skip unread count aggregation if user still has no chats (though Orbit AI should exist now)
         if (results.length === 0) {
             res.status(200).send([]);
             return;
@@ -107,36 +137,6 @@ const fetchChats: any = asyncHandler(async (req: any, res: Response): Promise<vo
             ...chat,
             unreadCount: unreadMap[chat._id.toString()] || 0
         }));
-
-        // Ensure Orbit AI chat exists for this user in their list by default
-        const orbitAI = await User.findOne({ email: "orbit-ai@orbit.app" });
-        if (orbitAI) {
-            const hasOrbitChat = results.some((chat: any) =>
-                !chat.isGroupChat && chat.users.some((u: any) => u.email === "orbit-ai@orbit.app")
-            );
-
-            if (!hasOrbitChat) {
-                // Background ensure: Create the chat document if it doesn't exist
-                let newOrbitChat: any = await Chat.findOne({
-                    isGroupChat: false,
-                    $and: [
-                        { users: { $elemMatch: { $eq: req.user._id } } },
-                        { users: { $elemMatch: { $eq: orbitAI._id } } },
-                    ],
-                });
-
-                if (!newOrbitChat) {
-                    newOrbitChat = await Chat.create({
-                        chatName: "Orbit AI",
-                        isGroupChat: false,
-                        users: [req.user._id, orbitAI._id],
-                    });
-                }
-
-                // Return fresh list for new user/connection
-                return fetchChats(req, res);
-            }
-        }
 
         res.status(200).send(chatsWithUnread);
     } catch (error: any) {
