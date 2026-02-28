@@ -5,7 +5,7 @@ import { Plus, Pin } from "lucide-react";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { motion, AnimatePresence } from "framer-motion";
 
-const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
+const MyChats = () => {
     const [loading, setLoading] = useState(true);
     const { selectedChat, setSelectedChat, user, chats, setChats, onlineUsers, notification } = useChatStore();
 
@@ -30,7 +30,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
 
     useEffect(() => {
         fetchChats();
-    }, [fetchAgain]);
+    }, []);
 
     // Resolves a basic string name representing the other participant in a one-on-one chat.
     // Relies on simple ID mapping to verify against the local connected user instance.
@@ -80,7 +80,7 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
     }) : [];
 
     return (
-        <div className={`flex flex-col items-center p-3 py-6 bg-[#0c0c0e]/40 backdrop-blur-3xl w-full md:w-[32%] h-full border-r border-white/5 ${selectedChat ? "hidden md:flex" : "flex"}`}>
+        <div className={`flex flex-col items-center p-3 py-6 bg-[#0c0c0e]/60 backdrop-blur-xl w-full md:w-[32%] h-full border-r border-white/5 ${selectedChat ? "hidden md:flex" : "flex"}`}>
             <div className="pb-6 px-4 flex w-full justify-between items-center">
                 <h1 className="text-2xl font-bold text-white tracking-tighter">Messages</h1>
                 <GroupChatModal>

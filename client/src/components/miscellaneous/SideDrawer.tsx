@@ -83,7 +83,7 @@ const SideDrawer = () => {
 
     return (
         <>
-            <div className="flex justify-between items-center bg-zinc-950/40 backdrop-blur-3xl px-8 py-4 border-b border-white/[0.05] w-full relative z-40">
+            <div className="flex justify-between items-center bg-zinc-950/40 backdrop-blur-xl px-8 py-4 border-b border-white/[0.05] w-full relative z-40">
                 <button
                     className="flex items-center gap-3 px-5 py-2.5 text-zinc-400 hover:text-white transition-all bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] rounded-2xl group"
                     onClick={() => setIsSearchOpen(true)}
@@ -120,7 +120,7 @@ const SideDrawer = () => {
                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    className="absolute right-0 top-full mt-4 w-72 bg-[#0c0c0e]/90 border border-white/[0.08] rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-3xl"
+                                    className="absolute right-0 top-full mt-4 w-72 bg-[#0c0c0e]/95 border border-white/[0.08] rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-xl"
                                 >
                                     <div className="p-3">
                                         <h3 className="px-3 pb-2 text-sm font-semibold text-zinc-400 border-b border-white/[0.05]">
@@ -173,7 +173,7 @@ const SideDrawer = () => {
                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    className="absolute right-0 top-full mt-4 w-60 bg-[#0c0c0e]/90 border border-white/[0.08] rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-3xl"
+                                    className="absolute right-0 top-full mt-4 w-60 bg-[#0c0c0e]/95 border border-white/[0.08] rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-xl"
                                 >
                                     <div className="p-3 space-y-1">
                                         <button

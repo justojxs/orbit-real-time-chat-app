@@ -53,13 +53,13 @@
       linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
       url('/orbit-bg.png');
-    background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px, cover;
-    background-position: top left, bottom right, center center, center center, center center;
+    background-size: cover;
+    background-position: center;
     background-attachment: fixed;
   }
 
   .glass-panel {
-    @apply bg-[#0a0a0c]/40 backdrop-blur-3xl border border-white/[0.05];
+    @apply bg-[#0a0a0c]/60 backdrop-blur-xl border border-white/[0.05];
     box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.6);
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }

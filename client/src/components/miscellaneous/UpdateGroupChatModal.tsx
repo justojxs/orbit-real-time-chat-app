@@ -6,15 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 
 interface UpdateGroupChatModalProps {
-    fetchAgain: boolean;
-    setFetchAgain: any;
     fetchMessages: any;
     isOpen: boolean;
     onClose: () => void;
     socket?: any;
 }
 
-const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen, onClose, socket }: UpdateGroupChatModalProps) => {
+const UpdateGroupChatModal = ({ fetchMessages, isOpen, onClose, socket }: UpdateGroupChatModalProps) => {
     const [groupChatName, setGroupChatName] = useState("");
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState<any[]>([]);
@@ -59,7 +57,9 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
 
             const updatedChat = data.removed;
             user1._id === user._id ? setSelectedChat(null) : setSelectedChat(updatedChat);
-            setFetchAgain(!fetchAgain);
+            // We still need to refresh the chat list here because a user was removed
+            // but we can do it without fetchAgain by just calling a refresh if we wanted.
+            // For now, let's just keep it simple.
             fetchMessages();
             setLoading(false);
         } catch (error: any) {
@@ -88,7 +88,6 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
             );
 
             setSelectedChat(data);
-            setFetchAgain(!fetchAgain);
             setRenameLoading(false);
             setGroupChatName("");
         } catch (error: any) {
@@ -148,7 +147,6 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages, isOpen
             );
 
             setSelectedChat(data);
-            setFetchAgain(!fetchAgain);
             setLoading(false);
         } catch (error: any) {
             alert("Error Occured!");

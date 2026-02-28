@@ -10,7 +10,7 @@ import WhiteboardModal from "./WhiteboardModal";
 
 let selectedChatCompare: any;
 
-const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFetchAgain: any }) => {
+const SingleChat = () => {
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [newMessage, setNewMessage] = useState("");
@@ -36,8 +36,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const timerRef = useRef<any>(null);
+    const typingTimeoutRef = useRef<any>(null);
 
-    const { user, selectedChat, setSelectedChat, notification, setNotification, socket, onlineUsers } = useChatStore();
+    const { user, selectedChat, setSelectedChat, notification, setNotification, socket, onlineUsers, updateChatPreview } = useChatStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Bootstraps initial chat load by hitting the backend message index endpoint.
@@ -67,7 +68,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             setLoading(false);
             socket.emit("join chat", selectedChat._id);
             socket.emit("read message", { chatId: selectedChat._id, userId: user._id });
-            setFetchAgain(!fetchAgain); // Force MyChats to refresh unread counts instantly
+
+            // If we have messages, update the preview with the last one
+            if (data.length > 0) {
+                updateChatPreview(data[data.length - 1]);
+            }
         } catch (error: any) {
             console.error("Fetch messages error:", error);
         }
@@ -210,8 +215,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             const { data } = await api.post("/api/message", payload, config);
             socket.emit("new message", data);
             setMessages([...messages, data]);
+            updateChatPreview(data); // Local update instead of flipping fetchAgain
             setUploadingFile(false);
-            setFetchAgain(!fetchAgain); // Instantly update sidebar preview on outbound message
         } catch (error: any) {
             console.error("Send message error:", error);
             setUploadingFile(false);
@@ -399,14 +404,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
 
         socket.on("message recieved", (newMessageRecieved: any) => {
             if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
-                if (!notification.includes(newMessageRecieved)) {
-                    setNotification([newMessageRecieved, ...notification]);
-                    setFetchAgain(!fetchAgain);
-                }
+                setNotification((prev: any[]) => {
+                    if (!prev.find((n: any) => n._id === newMessageRecieved._id)) {
+                        return [newMessageRecieved, ...prev];
+                    }
+                    return prev;
+                });
+                updateChatPreview(newMessageRecieved);
             } else {
                 setMessages((prev) => [...prev, newMessageRecieved]);
                 socket.emit("read message", { chatId: selectedChatCompare._id, userId: user._id });
-                setFetchAgain(!fetchAgain); // Force sidebar to update latest message instantly
+                updateChatPreview(newMessageRecieved);
             }
         });
 
@@ -450,7 +458,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
             socket.off("typing");
             socket.off("stop typing");
         }
-    }, [socket, notification, fetchAgain, setFetchAgain]);
+    }, [socket, updateChatPreview]);
 
     useEffect(() => {
         fetchMessages();
@@ -470,20 +478,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
     const typingHandler = (e: any) => {
         setNewMessage(e.target.value);
         if (!socket) return;
+
         if (!typing) {
             setTyping(true);
             socket.emit("typing", selectedChat._id);
         }
-        let lastTypingTime = new Date().getTime();
-        var timerLength = 3000;
-        setTimeout(() => {
-            var timeNow = new Date().getTime();
-            var timeDiff = timeNow - lastTypingTime;
-            if (timeDiff >= timerLength && typing) {
-                socket.emit("stop typing", selectedChat._id);
-                setTyping(false);
-            }
-        }, timerLength);
+
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+        typingTimeoutRef.current = setTimeout(() => {
+            socket.emit("stop typing", selectedChat._id);
+            setTyping(false);
+        }, 3000);
     };
 
     const getSender = (loggedUser: any, users: any[]) => {
@@ -848,8 +854,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFet
 
                     {selectedChat.isGroupChat && (
                         <UpdateGroupChatModal
-                            fetchAgain={fetchAgain}
-                            setFetchAgain={setFetchAgain}
                             fetchMessages={fetchMessages}
                             isOpen={isGroupOpen}
                             onClose={() => setIsGroupOpen(false)}

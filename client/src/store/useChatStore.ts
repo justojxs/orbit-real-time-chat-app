@@ -9,13 +9,14 @@ interface ChatStore {
     user: any;
     setUser: (user: any) => void;
     notification: any[];
-    setNotification: (notifs: any[]) => void;
+    setNotification: (notifs: any[] | ((prev: any[]) => any[])) => void;
     chats: any[];
     setChats: (chats: any[] | ((prev: any[]) => any[])) => void;
     socket: any;
     onlineUsers: Record<string, { isOnline: boolean, lastSeen?: string }>;
     setOnlineUsers: (users: any | ((prev: any) => any)) => void;
     initSocket: (userInfo: any) => void;
+    updateChatPreview: (message: any) => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -24,7 +25,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     user: null,
     setUser: (user) => set({ user }),
     notification: [],
-    setNotification: (notification) => set({ notification }),
+    setNotification: (notification) => {
+        if (typeof notification === "function") {
+            set((state) => ({ notification: notification(state.notification) }));
+        } else {
+            set({ notification });
+        }
+    },
     chats: [],
     setChats: (chats) => {
         if (typeof chats === "function") {
@@ -32,6 +39,17 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         } else {
             set({ chats });
         }
+    },
+    updateChatPreview: (message) => {
+        const { chats } = get();
+        if (!chats) return;
+
+        const updatedChats = chats.map((chat) =>
+            chat._id === message.chat._id
+                ? { ...chat, latestMessage: message, updatedAt: new Date().toISOString() }
+                : chat
+        );
+        set({ chats: updatedChats });
     },
     socket: null,
     onlineUsers: {},

@@ -2,7 +2,7 @@ import { useChatStore } from "../store/useChatStore";
 import SingleChat from "./SingleChat";
 import WelcomeScreen from "./WelcomeScreen";
 
-const ChatBox = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFetchAgain: any }) => {
+const ChatBox = () => {
     const { selectedChat } = useChatStore();
 
     return (
@@ -11,7 +11,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain }: { fetchAgain: boolean, setFetchA
                 items-center flex-col glass-panel w-full md:w-[68%] rounded-[2rem] border-white/5 h-full relative overflow-hidden`}
         >
             {selectedChat ? (
-                <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+                <SingleChat />
             ) : (
                 <WelcomeScreen />
             )}
