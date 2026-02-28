@@ -12,5 +12,17 @@ export default defineConfig({
         secure: false,
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          framer: ['framer-motion'],
+          lucide: ['lucide-react'],
+          socket: ['socket.io-client']
+        }
+      }
+    }
   }
 })
