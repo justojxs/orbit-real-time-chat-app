@@ -47,10 +47,10 @@ const HomePage = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="flex items-center gap-3"
+                    className="flex items-center gap-4"
                 >
-                    <img src="/logo.png" className="w-9 h-9 object-contain" alt="Orbit" />
-                    <span className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">ORBIT</span>
+                    <img src="/logo.png" className="w-14 h-14 object-contain drop-shadow-lg" alt="Orbit" />
+                    <span className="text-4xl font-extrabold tracking-tighter text-gray-900 dark:text-white drop-shadow-sm">ORBIT</span>
                 </motion.div>
 
                 <div className="flex-1 flex flex-col justify-center max-w-xl">
@@ -118,10 +118,10 @@ const HomePage = () => {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="flex items-center gap-3 mb-10 lg:hidden"
+                        className="flex items-center gap-3.5 mb-10 lg:hidden"
                     >
-                        <img src="/logo.png" className="w-8 h-8 object-contain" alt="Orbit" />
-                        <span className="text-lg font-bold tracking-tighter text-gray-900 dark:text-white">ORBIT</span>
+                        <img src="/logo.png" className="w-12 h-12 object-contain drop-shadow-md" alt="Orbit" />
+                        <span className="text-3xl font-extrabold tracking-tighter text-gray-900 dark:text-white drop-shadow-sm">ORBIT</span>
                     </motion.div>
 
                     <motion.div
