@@ -13,25 +13,25 @@ const OrbitBrand = ({ size = "md", showLogo = true, animated = false }: OrbitBra
 
     const sizeMap = {
         sm: {
-            logo: 30,
-            textH: 20,
-            textW: 72,
+            logo: 26,
+            textH: 26,
+            textW: 52,
+            textSize: 20,
+            gap: "gap-2",
+        },
+        md: {
+            logo: 34,
+            textH: 34,
+            textW: 68,
             textSize: 26,
             gap: "gap-2.5",
         },
-        md: {
-            logo: 42,
-            textH: 28,
-            textW: 100,
-            textSize: 36,
-            gap: "gap-3",
-        },
         lg: {
-            logo: 60,
-            textH: 48,
-            textW: 170,
-            textSize: 62,
-            gap: "gap-4",
+            logo: 56,
+            textH: 52,
+            textW: 120,
+            textSize: 44,
+            gap: "gap-3",
         },
     };
 
@@ -54,9 +54,10 @@ const OrbitBrand = ({ size = "md", showLogo = true, animated = false }: OrbitBra
                     className="flex-shrink-0"
                 >
                     <svg
-                        viewBox="0 0 120 120"
+                        viewBox="-10 -10 140 140"
                         width={config.logo}
                         height={config.logo}
+                        overflow="visible"
                         className="drop-shadow-md"
                     >
                         <defs>
@@ -140,6 +141,7 @@ const OrbitBrand = ({ size = "md", showLogo = true, animated = false }: OrbitBra
                     width={config.textW}
                     height={config.textH}
                     viewBox={`0 0 ${config.textW} ${config.textH}`}
+                    overflow="visible"
                     className="block"
                 >
                     <defs>
@@ -161,12 +163,13 @@ const OrbitBrand = ({ size = "md", showLogo = true, animated = false }: OrbitBra
                     </defs>
                     <text
                         x="0"
-                        y={config.textH * 0.82}
+                        y={config.textH * 0.78}
                         fill={`url(#${uid}_textGrad)`}
                         fontFamily="'Outfit', sans-serif"
                         fontWeight="800"
                         fontSize={config.textSize}
                         letterSpacing="1"
+                        dominantBaseline="auto"
                     >
                         Orbit
                     </text>
