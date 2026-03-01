@@ -5,6 +5,7 @@ import api from "../../lib/axios";
 import { Loader2, Search, Bell, ChevronDown, LogOut, User as UserIcon, X, BadgeCheck } from "lucide-react";
 import ThemeToggle from "../ThemeToggle";
 import ProfileModal from "./ProfileModal";
+import OrbitBrand from "../OrbitBrand";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SideDrawer = () => {
@@ -93,12 +94,11 @@ const SideDrawer = () => {
                     <span className="hidden md:inline text-[10px] font-bold uppercase tracking-[0.2em]">Search Network</span>
                 </button>
 
-                <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/chats')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-emerald-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <img src="/logo.png" className="w-8 h-8 object-contain relative transition-transform duration-700 group-hover:rotate-[360deg]" alt="Orbit Logo" />
-                    </div>
-                    <h1 className="text-2xl font-bold tracking-tighter text-gray-900 dark:text-white">Orbit</h1>
+                <div 
+                    className="flex items-center gap-3 cursor-pointer transition-opacity hover:opacity-80"
+                    onClick={() => navigate('/chats')}
+                >
+                    <OrbitBrand size="sm" showLogo={true} animated={false} />
                 </div>
 
                 <div className="flex items-center gap-4">

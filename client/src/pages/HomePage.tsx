@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Zap, Globe, Users, MessageCircle, Bot, Lock, Linkedin } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
 import OrbiterText from "../components/OrbiterText";
+import OrbitBrand from "../components/OrbitBrand";
 
 const HIGHLIGHTS = [
     { icon: Zap, text: "Real-time WebSocket messaging" },
@@ -50,8 +51,7 @@ const HomePage = () => {
                     transition={{ duration: 0.5 }}
                     className="flex items-center gap-4"
                 >
-                    <img src="/logo.png" className="w-14 h-14 object-contain drop-shadow-lg" alt="Orbit" />
-                    <span className="text-4xl font-extrabold tracking-tighter text-gray-900 dark:text-white drop-shadow-sm">ORBIT</span>
+                    <OrbitBrand size="lg" animated={true} />
                 </motion.div>
 
                 <div className="flex-1 flex flex-col justify-center max-w-xl">
@@ -121,8 +121,7 @@ const HomePage = () => {
                         animate={{ opacity: 1 }}
                         className="flex items-center gap-3.5 mb-10 lg:hidden"
                     >
-                        <img src="/logo.png" className="w-12 h-12 object-contain drop-shadow-md" alt="Orbit" />
-                        <span className="text-3xl font-extrabold tracking-tighter text-gray-900 dark:text-white drop-shadow-sm">ORBIT</span>
+                        <OrbitBrand size="md" animated={true} />
                     </motion.div>
 
                     <motion.div

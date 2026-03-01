@@ -15,7 +15,7 @@ const OrbiterText = () => {
                 y: -1,
             }}
         >
-            {/* Inline text styled as continuation of heading */}
+            {/* Premium styled inline text */}
             <span 
                 className="relative inline-block font-bold tracking-tight"
                 style={{
@@ -32,7 +32,7 @@ const OrbiterText = () => {
             >
                 Orbiter
                 
-                {/* Subtle animated underline accent */}
+                {/* Animated underline accent */}
                 <motion.div
                     className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-transparent rounded-full"
                     initial={{ width: 0, opacity: 0 }}
@@ -45,16 +45,16 @@ const OrbiterText = () => {
                     }}
                 />
                 
-                {/* Subtle glow halo in dark mode */}
+                {/* Subtle breathing glow halo in dark mode */}
                 {isDark && (
                     <motion.div
                         className="absolute -inset-2 rounded-lg pointer-events-none"
                         style={{
-                            background: "radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)",
+                            background: "radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)",
                             zIndex: -1,
                         }}
                         animate={{
-                            opacity: [0.5, 0.8, 0.5],
+                            opacity: [0.4, 0.7, 0.4],
                         }}
                         transition={{
                             duration: 4,
