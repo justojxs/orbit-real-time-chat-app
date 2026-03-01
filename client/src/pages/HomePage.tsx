@@ -199,7 +199,7 @@ const HomePage = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1, duration: 0.8 }}
-                className="absolute bottom-0 left-0 right-0 z-20 py-5 px-6 flex items-center justify-center gap-2"
+                className="fixed bottom-0 left-0 right-0 z-[90] py-4 px-6 flex items-center justify-center gap-2 bg-white/60 dark:bg-[#08080c]/70 backdrop-blur-md"
             >
                 <span className="text-[13px] text-gray-400 dark:text-zinc-500 font-medium tracking-wide">
                     Designed & maintained with{" "}
