@@ -236,8 +236,9 @@ const ProfileModal = ({ user: displayUser, children, isOpen, onClose }: ProfileM
                                         <div className="absolute inset-0 bg-emerald-50 blur-2xl rounded-full"></div>
                                         <img
                                             className="w-full h-full rounded-full border-2 border-gray-200 dark:border-white/5 p-1 object-cover relative z-10"
-                                            src={pic || displayUser?.pic}
+                                            src={pic || displayUser?.pic || '/default-avatar.svg'}
                                             alt={displayUser?.name}
+                                            onError={(e) => { (e.target as HTMLImageElement).src = '/default-avatar.svg'; }}
                                         />
                                         <AnimatePresence>
                                             {isEditing && isCurrentUser && (

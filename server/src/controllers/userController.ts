@@ -83,11 +83,11 @@ const authUser = asyncHandler(async (req: Request, res: Response) => {
             name: 'Guest User',
             email: 'guest@example.com',
             password: '123456',
-            pic: 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg',
+            pic: 'https://www.gravatar.com/avatar/?d=mp&s=256',
         });
 
         // Fire-and-forget: seed dummy users in background so the guest login returns FAST
-        const defaultPic = 'https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg';
+        const defaultPic = 'https://www.gravatar.com/avatar/?d=mp&s=256';
         const dummyUsers = [
             { name: "John Doe", email: "john@example.com", password: "password", pic: defaultPic },
             { name: "Jane Smith", email: "jane@example.com", password: "password", pic: defaultPic },
@@ -243,7 +243,7 @@ const authGoogleUser = asyncHandler(async (req: Request, res: Response) => {
             name: payload.name || "Google User",
             email: payload.email,
             password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8), // Strong random password
-            pic: payload.picture || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+            pic: payload.picture || "https://www.gravatar.com/avatar/?d=mp&s=256",
         });
     }
 

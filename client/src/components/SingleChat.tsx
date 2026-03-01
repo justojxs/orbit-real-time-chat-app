@@ -546,6 +546,7 @@ const SingleChat = () => {
                                             src={getSenderFull(user, selectedChat.users).pic}
                                             className="w-10 h-10 rounded-full object-cover relative border border-gray-200 dark:border-white/5"
                                             alt="avatar"
+                                            onError={(e) => { (e.target as HTMLImageElement).src = '/default-avatar.svg'; }}
                                         />
                                         <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white transition-colors ${getStatus() === 'Online' || isTyping ? 'bg-emerald-500' : 'bg-gray-300'}`}></div>
                                     </div>

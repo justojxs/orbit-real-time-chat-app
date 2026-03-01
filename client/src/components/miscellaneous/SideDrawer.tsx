@@ -165,6 +165,7 @@ const SideDrawer = () => {
                             <img
                                 src={user.pic}
                                 alt={user.name}
+                                onError={(e) => { (e.target as HTMLImageElement).src = '/default-avatar.svg'; }}
                                 className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-white/5"
                             />
                             <ChevronDown size={14} className={`text-gray-400 dark:text-zinc-500 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
@@ -265,7 +266,7 @@ const SideDrawer = () => {
                                             onClick={() => accessChat(user._id)}
                                             className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-[#0e0e13] hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 rounded-[1.25rem] cursor-pointer transition-all border border-gray-200/60 dark:border-white/[0.04] hover:border-gray-300 dark:border-white/10 dark:hover:border-white/20 group"
                                         >
-                                            <img src={user.pic} alt={user.name} className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-white/5 group-hover:border-emerald-400 transition-colors" />
+                                            <img src={user.pic} alt={user.name} onError={(e) => { (e.target as HTMLImageElement).src = '/default-avatar.svg'; }} className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-white/5 group-hover:border-emerald-400 transition-colors" />
                                             <div className="flex-1 overflow-hidden">
                                                 <div className="flex items-center gap-1.5">
                                                     <h4 className="text-sm font-bold text-gray-700 dark:text-zinc-200 truncate group-hover:text-emerald-600 transition-colors">{user.name}</h4>

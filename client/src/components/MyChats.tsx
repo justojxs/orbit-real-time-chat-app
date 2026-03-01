@@ -142,9 +142,10 @@ const MyChats = () => {
                                         <div className="relative flex-shrink-0">
                                             {!chat.isGroupChat ? (
                                                 <img
-                                                    src={getSenderFull(chat.users)?.pic || "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"}
+                                                    src={getSenderFull(chat.users)?.pic || "/default-avatar.svg"}
                                                     className="w-11 h-11 rounded-full object-cover border border-gray-200 dark:border-white/5"
                                                     alt="avatar"
+                                                    onError={(e) => { (e.target as HTMLImageElement).src = '/default-avatar.svg'; }}
                                                 />
                                             ) : (
                                                 <div className="w-11 h-11 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold text-base border border-emerald-200 dark:border-emerald-500/20">
