@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <radialGradient id="fs" cx="40%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="60%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </radialGradient>
+  </defs>
+  <!-- Planet sphere -->
+  <circle cx="60" cy="60" r="30" fill="url(#fs)"/>
+  <!-- Highlight -->
+  <ellipse cx="50" cy="48" rx="12" ry="10" fill="white" opacity="0.15"/>
+  <!-- Orbital ring -->
+  <ellipse cx="60" cy="60" rx="52" ry="18" fill="none" stroke="url(#fg)" stroke-width="4" opacity="0.85" transform="rotate(-25 60 60)" stroke-linecap="round"/>
+  <!-- Orbiting particle -->
+  <circle cx="108" cy="46" r="6" fill="url(#fg)" opacity="0.9"/>
+</svg>
