@@ -6,152 +6,90 @@ interface OrbitLogoProps {
     variant?: "dark" | "light" | "auto";
 }
 
-const OrbitLogo = ({ size = 40, animated = false, variant = "auto" }: OrbitLogoProps) => {
+const OrbitLogo = ({ size = 40, animated = false }: OrbitLogoProps) => {
+    // Unique IDs to avoid SVG conflicts
+    const uid = `orbitLogo_${size}`;
+
     return (
         <motion.svg
-            viewBox="0 0 100 100"
+            viewBox="0 0 120 120"
             width={size}
             height={size}
-            className="drop-shadow-lg"
+            className="drop-shadow-md"
             animate={
                 animated
                     ? {
-                          filter: [
-                              "drop-shadow(0 0 4px rgba(16,185,129,0.3))",
-                              "drop-shadow(0 0 12px rgba(16,185,129,0.5))",
-                              "drop-shadow(0 0 4px rgba(16,185,129,0.3))",
-                          ],
-                      }
+                        filter: [
+                            "drop-shadow(0 0 4px rgba(16,185,129,0.3))",
+                            "drop-shadow(0 0 10px rgba(16,185,129,0.45))",
+                            "drop-shadow(0 0 4px rgba(16,185,129,0.3))",
+                        ],
+                    }
                     : {}
             }
             transition={animated ? { duration: 3, repeat: Infinity } : {}}
         >
             <defs>
-                <linearGradient id="orbitGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id={`${uid}_grad`} x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#10b981" />
                     <stop offset="50%" stopColor="#14b8a6" />
-                    <stop offset="100%" stopColor="#0891b2" />
+                    <stop offset="100%" stopColor="#06b6d4" />
                 </linearGradient>
-                <filter id="softGlow">
-                    <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+                <radialGradient id={`${uid}_sphere`} cx="40%" cy="35%" r="55%">
+                    <stop offset="0%" stopColor="#34d399" />
+                    <stop offset="60%" stopColor="#14b8a6" />
+                    <stop offset="100%" stopColor="#0891b2" />
+                </radialGradient>
+                <filter id={`${uid}_glow`}>
+                    <feGaussianBlur stdDeviation="2" result="blur" />
                     <feMerge>
-                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="blur" />
                         <feMergeNode in="SourceGraphic" />
                     </feMerge>
                 </filter>
             </defs>
 
-            {/* Outer orbit ring */}
+            {/* Planet sphere */}
             <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="url(#orbitGradient)"
-                strokeWidth="2"
-                opacity="0.6"
-                filter="url(#softGlow)"
+                cx="60"
+                cy="60"
+                r="30"
+                fill={`url(#${uid}_sphere)`}
+                filter={`url(#${uid}_glow)`}
             />
 
-            {/* Middle orbit ring */}
-            <circle
+            {/* Highlight reflection */}
+            <ellipse
                 cx="50"
-                cy="50"
-                r="32"
-                fill="none"
-                stroke="url(#orbitGradient)"
-                strokeWidth="1.5"
-                opacity="0.4"
+                cy="48"
+                rx="12"
+                ry="10"
+                fill="white"
+                opacity="0.15"
             />
 
-            {/* Inner circle core */}
+            {/* Orbital ring */}
+            <ellipse
+                cx="60"
+                cy="60"
+                rx="52"
+                ry="18"
+                fill="none"
+                stroke={`url(#${uid}_grad)`}
+                strokeWidth="3.5"
+                opacity="0.85"
+                transform="rotate(-25 60 60)"
+                strokeLinecap="round"
+            />
+
+            {/* Orbiting particle */}
             <circle
-                cx="50"
-                cy="50"
-                r="18"
-                fill="url(#orbitGradient)"
+                cx="108"
+                cy="46"
+                r="5"
+                fill={`url(#${uid}_grad)`}
+                filter={`url(#${uid}_glow)`}
                 opacity="0.9"
-                filter="url(#softGlow)"
-            />
-
-            {/* Orbiting particle 1 */}
-            <motion.circle
-                cx="50"
-                cy="12"
-                r="3"
-                fill="url(#orbitGradient)"
-                opacity="0.8"
-                animate={
-                    animated
-                        ? { rotate: 360 }
-                        : {}
-                }
-                transition={
-                    animated
-                        ? { duration: 8, repeat: Infinity, ease: "linear" }
-                        : {}
-                }
-                style={{ transformOrigin: "50px 50px" }}
-            />
-
-            {/* Orbiting particle 2 */}
-            <motion.circle
-                cx="88"
-                cy="50"
-                r="2.5"
-                fill="url(#orbitGradient)"
-                opacity="0.7"
-                animate={
-                    animated
-                        ? { rotate: 360 }
-                        : {}
-                }
-                transition={
-                    animated
-                        ? { duration: 10, repeat: Infinity, ease: "linear" }
-                        : {}
-                }
-                style={{ transformOrigin: "50px 50px" }}
-            />
-
-            {/* Orbiting particle 3 */}
-            <motion.circle
-                cx="50"
-                cy="88"
-                r="2"
-                fill="url(#orbitGradient)"
-                opacity="0.6"
-                animate={
-                    animated
-                        ? { rotate: 360 }
-                        : {}
-                }
-                transition={
-                    animated
-                        ? { duration: 12, repeat: Infinity, ease: "linear" }
-                        : {}
-                }
-                style={{ transformOrigin: "50px 50px" }}
-            />
-
-            {/* Orbiting particle 4 */}
-            <motion.circle
-                cx="12"
-                cy="50"
-                r="2.5"
-                fill="url(#orbitGradient)"
-                opacity="0.7"
-                animate={
-                    animated
-                        ? { rotate: 360 }
-                        : {}
-                }
-                transition={
-                    animated
-                        ? { duration: 9, repeat: Infinity, ease: "linear" }
-                        : {}
-                }
-                style={{ transformOrigin: "50px 50px" }}
             />
         </motion.svg>
     );

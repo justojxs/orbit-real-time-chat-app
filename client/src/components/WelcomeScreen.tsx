@@ -1,6 +1,7 @@
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { MessageSquare, Sparkles, Zap, Users, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import OrbitLogo from "./OrbitLogo";
 
 const ACTIONS = [
     {
@@ -33,7 +34,7 @@ const WelcomeScreen = () => {
             >
                 {/* Logo */}
                 <div className="w-16 h-16 bg-gray-50 dark:bg-[#0e0e13] border border-gray-200 dark:border-white/5 rounded-2xl flex items-center justify-center mb-8 shadow-lg">
-                    <img src="/logo.png" alt="Orbit Logo" className="w-8 h-8 object-contain" />
+                    <OrbitLogo size={32} />
                 </div>
 
                 {/* Heading */}
