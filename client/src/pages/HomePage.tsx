@@ -2,7 +2,7 @@ import { useState } from "react";
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Zap, Globe, Users, MessageCircle, Bot, Lock } from "lucide-react";
+import { Shield, Zap, Globe, Users, MessageCircle, Bot, Lock, Linkedin } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
 
 const HIGHLIGHTS = [
@@ -193,6 +193,30 @@ const HomePage = () => {
                     </motion.div>
                 </div>
             </div>
+
+            {/* Footer */}
+            <motion.footer
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 0.8 }}
+                className="absolute bottom-0 left-0 right-0 z-20 py-5 px-6 flex items-center justify-center gap-2"
+            >
+                <span className="text-[13px] text-gray-400 dark:text-zinc-500 font-medium tracking-wide">
+                    Designed & maintained with{" "}
+                    <span className="text-red-500 text-base align-middle">❤️</span>{" "}
+                    by{" "}
+                    <span className="font-semibold text-gray-500 dark:text-zinc-400">Ojas Gupta</span>
+                </span>
+                <a
+                    href="https://www.linkedin.com/in/ojas-gupta-aa6443206/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-1.5 text-gray-400 dark:text-zinc-500 hover:text-[#0A66C2] dark:hover:text-[#0A66C2] transition-colors duration-300"
+                    aria-label="Ojas Gupta's LinkedIn Profile"
+                >
+                    <Linkedin size={18} />
+                </a>
+            </motion.footer>
         </div>
     );
 };

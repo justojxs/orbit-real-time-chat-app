@@ -71,7 +71,7 @@ const Login = () => {
             <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl p-4 flex gap-3 text-emerald-800 dark:text-emerald-200">
                 <Info className="flex-shrink-0 text-emerald-500 mt-0.5" size={18} />
                 <div className="text-xs leading-relaxed font-medium">
-                    <span className="font-bold">Demo Tester Note:</span> The backend is currently deployed on a free Render instance. Please be patient—it may take <span className="font-bold underline decoration-emerald-500/30 underline-offset-2">20-25 seconds</span> to wake up from a cold start during your initial login attempt!
+                    <span className="font-bold">Demo Tester Note:</span> The backend of this website is deployed on a free Render instance. Please be patient—it may take <span className="font-bold underline decoration-emerald-500/30 underline-offset-2">20-25 seconds</span> to wake up from a cold start during your initial login attempt!
                 </div>
             </div>
             <div className="space-y-2">
