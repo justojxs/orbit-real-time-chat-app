@@ -4,6 +4,7 @@ import Signup from "../components/Authentication/Signup";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Zap, Globe, Users, MessageCircle, Bot, Lock, Linkedin } from "lucide-react";
 import ThemeToggle from "../components/ThemeToggle";
+import OrbiterText from "../components/OrbiterText";
 
 const HIGHLIGHTS = [
     { icon: Zap, text: "Real-time WebSocket messaging" },
@@ -130,19 +131,11 @@ const HomePage = () => {
                         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
                     >
                         <div className="mb-8">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight mb-1 flex items-center gap-1 flex-wrap">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight mb-1 flex items-center gap-2 flex-wrap">
                                 {view === "login" ? (
                                     <>
                                         <span>Welcome back,</span>
-                                        <motion.img
-                                            src="/orbiter-text.png"
-                                            alt="Orbiter"
-                                            className="h-[28px] object-contain inline-block drop-shadow-[0_0_12px_rgba(16,185,129,0.4)]"
-                                            initial={{ opacity: 0, x: -8 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                            whileHover={{ y: -2, filter: "drop-shadow(0 0 18px rgba(16,185,129,0.6))" }}
-                                        />
+                                        <OrbiterText />
                                     </>
                                 ) : (
                                     "Create your account"
