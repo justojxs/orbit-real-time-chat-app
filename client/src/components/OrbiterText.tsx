@@ -6,124 +6,65 @@ const OrbiterText = () => {
     const isDark = theme === "dark";
 
     return (
-        <motion.div
-            className="relative inline-flex items-center h-[28px]"
+        <motion.span
+            className="relative inline-block"
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             whileHover={{ 
-                y: -2,
-                filter: isDark 
-                    ? "drop-shadow(0 0 18px rgba(16,185,129,0.8))" 
-                    : "drop-shadow(0 0 16px rgba(16,185,129,0.5))"
+                y: -1,
             }}
         >
-            {/* SVG-based text with space theme */}
-            <svg
-                viewBox="0 0 280 50"
-                className="h-[28px] w-auto"
-                preserveAspectRatio="xMidYMid meet"
+            {/* Inline text styled as continuation of heading */}
+            <span 
+                className="relative inline-block font-bold tracking-tight"
+                style={{
+                    background: isDark
+                        ? "linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #0891b2 100%)"
+                        : "linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #0891b2 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    filter: isDark
+                        ? "drop-shadow(0 0 8px rgba(16,185,129,0.5))"
+                        : "drop-shadow(0 0 6px rgba(16,185,129,0.4))",
+                }}
             >
-                <defs>
-                    {/* Gradient for text - light mode */}
-                    {!isDark && (
-                        <>
-                            <linearGradient id="orbiterGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
-                                <stop offset="50%" stopColor="#14b8a6" stopOpacity="1" />
-                                <stop offset="100%" stopColor="#0891b2" stopOpacity="1" />
-                            </linearGradient>
-                            <filter id="glowLight" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                        </>
-                    )}
-
-                    {/* Gradient for text - dark mode */}
-                    {isDark && (
-                        <>
-                            <linearGradient id="orbiterGradientDark" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
-                                <stop offset="50%" stopColor="#14b8a6" stopOpacity="1" />
-                                <stop offset="100%" stopColor="#0891b2" stopOpacity="1" />
-                            </linearGradient>
-                            <filter id="glowDark" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                        </>
-                    )}
-                </defs>
-
-                {/* Subtle background glow - only in dark mode */}
+                Orbiter
+                
+                {/* Subtle animated underline accent */}
+                <motion.div
+                    className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-transparent rounded-full"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: "100%", opacity: isDark ? 0.6 : 0.4 }}
+                    transition={{ delay: 0.5, duration: 0.6 }}
+                    style={{
+                        filter: isDark
+                            ? "drop-shadow(0 0 6px rgba(16,185,129,0.5))"
+                            : "drop-shadow(0 0 4px rgba(16,185,129,0.3))",
+                    }}
+                />
+                
+                {/* Subtle glow halo in dark mode */}
                 {isDark && (
-                    <circle
-                        cx="140"
-                        cy="25"
-                        r="35"
-                        fill="rgba(16,185,129,0.15)"
-                        filter="url(#glowDark)"
-                        className="animate-pulse"
+                    <motion.div
+                        className="absolute -inset-2 rounded-lg pointer-events-none"
                         style={{
-                            animation: "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                            background: "radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)",
+                            zIndex: -1,
+                        }}
+                        animate={{
+                            opacity: [0.5, 0.8, 0.5],
+                        }}
+                        transition={{
+                            duration: 4,
+                            repeat: Infinity,
+                            ease: "easeInOut",
                         }}
                     />
                 )}
-
-                {/* Main text with glow */}
-                <text
-                    x="140"
-                    y="32"
-                    textAnchor="middle"
-                    fontSize="36"
-                    fontWeight="800"
-                    fontFamily="system-ui, -apple-system, sans-serif"
-                    fill={isDark ? "url(#orbiterGradientDark)" : "url(#orbiterGradientLight)"}
-                    filter={isDark ? "url(#glowDark)" : "url(#glowLight)"}
-                    letterSpacing="0.8"
-                    className="font-bold select-none"
-                    style={{
-                        textShadow: isDark
-                            ? "0 0 8px rgba(16,185,129,0.4), 0 0 16px rgba(16,185,129,0.2)"
-                            : "0 0 4px rgba(16,185,129,0.3)",
-                        filter: isDark
-                            ? "drop-shadow(0 0 12px rgba(16,185,129,0.4))"
-                            : "drop-shadow(0 0 8px rgba(16,185,129,0.3))",
-                    }}
-                >
-                    Orbiter
-                </text>
-
-                {/* Decorative space accent - animated particle effect */}
-                {isDark && (
-                    <>
-                        <circle cx="270" cy="15" r="1.5" fill="rgba(16,185,129,0.6)" opacity="0.8" />
-                        <circle cx="20" cy="20" r="1" fill="rgba(16,185,129,0.5)" opacity="0.6" />
-                        <circle cx="80" cy="8" r="1.2" fill="rgba(16,185,129,0.4)" opacity="0.7" />
-                        <circle cx="220" cy="38" r="0.8" fill="rgba(16,185,129,0.5)" opacity="0.6" />
-                    </>
-                )}
-            </svg>
-
-            {/* CSS Animation for pulse effect */}
-            <style>{`
-                @keyframes pulse {
-                    0%, 100% {
-                        opacity: 0.6;
-                    }
-                    50% {
-                        opacity: 1;
-                    }
-                }
-            `}</style>
-        </motion.div>
+            </span>
+        </motion.span>
     );
 };
 
